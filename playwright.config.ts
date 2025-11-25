@@ -1,12 +1,11 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig } from "@playwright/test";
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+// Configs
+import {
+  BROWSER_CONFIGS,
+  AUTH_STATE_PATH,
+  TEST_PATTERNS,
+} from "./tests/config/browsers";
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -36,20 +35,26 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
-    },
+    // Setup project
+    { name: "setup", testMatch: TEST_PATTERNS.SETUP },
 
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-    },
+    // Unauthenticated tests (e.g., auth tests)
+    ...BROWSER_CONFIGS.map((browser) => ({
+      name: `${browser.name}-unauthenticated`,
+      use: { ...browser.device },
+      testMatch: TEST_PATTERNS.AUTH,
+    })),
 
-    {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] },
-    },
+    // Authenticated tests (all other tests)
+    ...BROWSER_CONFIGS.map((browser) => ({
+      name: browser.name,
+      use: {
+        ...browser.device,
+        storageState: AUTH_STATE_PATH,
+      },
+      dependencies: ["setup"],
+      testIgnore: TEST_PATTERNS.AUTH,
+    })),
 
     /* Test against mobile viewports. */
     // {
