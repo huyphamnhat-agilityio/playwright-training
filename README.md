@@ -107,13 +107,44 @@ pnpm test:webkit
 pnpm report
 ```
 
+## Parameterized Tests
+
+This framework uses Playwright's parameterization feature for data-driven testing. Test data is stored in `tests/data/` directory.
+
+**Example:**
+
+```typescript
+import { LOGIN_FAILURE_CASES } from "../data/auth-test-data";
+
+test.describe("Login Failure Scenarios", () => {
+  for (const testCase of LOGIN_FAILURE_CASES) {
+    test(`${testCase.testId}: User cannot login with ${testCase.description}`, async ({
+      page,
+    }) => {
+      // Test implementation using testCase data
+    });
+  }
+});
+```
+
+**Benefits:**
+
+- Reduce code duplication
+- Easy to add new test cases by updating data files
+- Better test organization
+- Clear test case identification
+
 ## Test Cases
 
 ### Authentication (TC_AUTH)
 
 - TC_AUTH_001: User can login with correct credentials
-- TC_AUTH_002: User cannot login with wrong credentials
+- TC_AUTH_002: User cannot login with wrong username and password (parameterized)
 - TC_AUTH_003: User can logout
+- TC_AUTH_004: User cannot login with empty username (parameterized)
+- TC_AUTH_005: User cannot login with empty password (parameterized)
+- TC_AUTH_006: User cannot login with empty username and password (parameterized)
+- TC_AUTH_007: User cannot login with locked out user (parameterized)
 
 ### Products (TC_PRODUCTS)
 
