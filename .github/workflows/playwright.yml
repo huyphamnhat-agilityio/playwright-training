@@ -27,21 +27,25 @@ jobs:
       - name: Run Playwright tests and generate HTML report
         run: pnpm exec playwright test --reporter=html
 
-      - name: Verify report folder
+      - name: Verify report folder exists
         run: ls -al playwright-report
 
       # === Deploy generated report folder directly to Vercel ===
       - name: Deploy Playwright report to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           npm install -g vercel
           vercel deploy playwright-report \
             --prod \
-            --token ${{ secrets.VERCEL_TOKEN }} \
-            --scope ${{ secrets.VERCEL_ORG_ID }} \
-            --project ${{ secrets.VERCEL_PROJECT_ID }} \
+            --token $VERCEL_TOKEN \
+            --scope $VERCEL_ORG_ID \
+            --project $VERCEL_PROJECT_ID \
             --confirm
 
-      # Optional: upload report artifact for GitHub
+      # Optional: Upload report artifact to GitHub
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
