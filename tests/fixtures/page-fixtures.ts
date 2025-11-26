@@ -4,12 +4,16 @@ import { test as base } from "@playwright/test";
 import { LoginPage } from "../pages/LoginPage";
 import { ProductPage } from "./../pages/ProductPage";
 import { ProductDetailPage } from "../pages/ProductDetailPage";
+import { CartPage } from "../pages/CartPage";
+import { CheckoutPage } from "../pages/CheckoutPage";
 
 // Define custom fixture types
 type CustomFixtures = {
   loginPage: LoginPage;
   productPage: ProductPage;
   productDetailPage: ProductDetailPage;
+  cartPage: CartPage;
+  checkoutPage: CheckoutPage;
 };
 
 // Extend base test with custom fixtures
@@ -27,6 +31,14 @@ export const test = base.extend<CustomFixtures>({
 
   productDetailPage: async ({ page }, use) => {
     await use(new ProductDetailPage(page));
+  },
+
+  cartPage: async ({ page }, use) => {
+    await use(new CartPage(page));
+  },
+
+  checkoutPage: async ({ page }, use) => {
+    await use(new CheckoutPage(page));
   },
 });
 

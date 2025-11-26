@@ -1,6 +1,24 @@
-# Playwright Test Automation Framework
+# Playwright Test Automation Training
 
 A Playwright-based test automation framework for testing the Sauce Demo website with TypeScript, Page Object Model, and global authentication.
+
+## Plan
+
+- Google Docs: [Playwright](https://docs.google.com/document/d/1u4Di-veBqsdhIPm8IZRZkiGRUCuDEh5p0mOii-DHw0k/edit?usp=sharing)
+
+## Targets
+
+- Codebase Structure:
+  - Set up essential configurations for the testing environment.
+
+- Test Case Development:
+  - Create test cases utilizing appropriate locators and user actions.
+
+- Assertions:
+  - Define clear and accurate expectations for each test scenario.
+
+- Tools for Debug & Troubleshooting:
+  - Use Playwright tools like Trace Viewer, Inspector, and logs for quick debugging.
 
 ## Features
 
@@ -89,38 +107,6 @@ pnpm test:webkit
 pnpm report
 ```
 
-## Linting and Formatting
-
-```bash
-# Run ESLint
-pnpm lint
-
-# Fix ESLint issues
-pnpm lint:fix
-
-# Format code with Prettier (runs automatically on commit)
-```
-
-## Writing Tests
-
-### Using Fixtures
-
-```typescript
-import { test, expect } from "../fixtures/page-fixtures";
-
-test("should see products", async ({ productPage }) => {
-  // productPage is already authenticated and on the product page
-  const count = await productPage.getProductCount();
-  expect(count).toBeGreaterThan(0);
-});
-```
-
-### Available Fixtures
-
-- `loginPage` - LoginPage instance
-- `productPage` - ProductPage instance (already navigated to product page)
-- `productDetailPage` - ProductDetailPage instance
-
 ## Test Cases
 
 ### Authentication (TC_AUTH)
@@ -152,14 +138,6 @@ refactor: code refactoring
 test: add or update tests
 ```
 
-## CI/CD
+## Author
 
-Pre-commit hooks automatically:
-
-- Run ESLint
-- Format code with Prettier
-- Validate commit messages
-
-## License
-
-ISC
+huy.phamnhat@asnet.com.vn
