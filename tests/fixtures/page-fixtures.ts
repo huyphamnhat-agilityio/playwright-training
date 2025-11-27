@@ -20,7 +20,10 @@ type CustomFixtures = {
 // Note: Authentication is handled globally via auth.setup.ts
 export const test = base.extend<CustomFixtures>({
   loginPage: async ({ page }, use) => {
-    await use(new LoginPage(page));
+    // Pre-condition: User access the login page
+    const loginPage = new LoginPage(page);
+    await loginPage.navigateTo();
+    await use(loginPage);
   },
 
   productPage: async ({ page }, use) => {

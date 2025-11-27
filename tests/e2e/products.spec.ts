@@ -1,6 +1,6 @@
 import { test, expect } from "../fixtures/page-fixtures";
 
-test.describe("Product Test Suite", () => {
+test.describe("Product Test Suite", { tag: "@products" }, () => {
   test("TC_PRODUCTS_001: User can see the product list", async ({
     productPage,
   }) => {
