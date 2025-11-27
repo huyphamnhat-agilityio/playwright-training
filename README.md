@@ -103,6 +103,15 @@ pnpm test:chromium
 pnpm test:firefox
 pnpm test:webkit
 
+# Run tests by tag
+pnpm test:auth                                  # Run only auth tests
+pnpm test:products                              # Run only product tests
+pnpm test:cart                                  # Run only cart tests
+pnpm exec playwright test --grep "@auth|@cart"  # Run auth and cart tests
+
+# Run tests excluding specific tags
+pnpm exec playwright test --grep-invert @auth   # Run all tests except auth
+
 # View test report
 pnpm report
 ```
@@ -136,7 +145,7 @@ test.describe("Login Failure Scenarios", () => {
 
 ## Test Cases
 
-### Authentication (TC_AUTH)
+### Authentication (@auth)
 
 - TC_AUTH_001: User can login with correct credentials
 - TC_AUTH_002: User cannot login with wrong username and password (parameterized)
@@ -146,7 +155,7 @@ test.describe("Login Failure Scenarios", () => {
 - TC_AUTH_006: User cannot login with empty username and password (parameterized)
 - TC_AUTH_007: User cannot login with locked out user (parameterized)
 
-### Products (TC_PRODUCTS)
+### Products (@products)
 
 - TC_PRODUCTS_001: User can see the product list
 - TC_PRODUCTS_002: User can filter products by price
@@ -154,6 +163,11 @@ test.describe("Login Failure Scenarios", () => {
 - TC_PRODUCTS_004: User can remove products from cart
 - TC_PRODUCTS_005: User can navigate to product detail page
 - TC_PRODUCTS_006: User can reset app state
+
+### Cart (@cart)
+
+- TC_CART_001: User can navigate to cart page
+- TC_CART_002: User can checkout from cart
 
 ## Commit Convention
 

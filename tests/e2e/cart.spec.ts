@@ -1,6 +1,6 @@
 import { test, expect } from "../fixtures/page-fixtures";
 
-test.describe("Cart Test Suite", () => {
+test.describe("Cart Test Suite", { tag: "@cart" }, () => {
   test("TC_CART_001: User can navigate to cart page", async ({
     productPage,
     cartPage,
