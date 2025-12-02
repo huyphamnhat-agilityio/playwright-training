@@ -3,6 +3,9 @@ import {
   USER_CREATION_TEST_DATA,
   USER_INVALID_FORM_TEST_DATA,
   USER_WRONG_VALUE_TEST_DATA,
+  USER_EDIT_TEST_DATA,
+  USER_EDIT_INVALID_TEST_DATA,
+  USER_EDIT_WRONG_VALUE_TEST_DATA,
 } from "@tests/constants/user-test-data";
 import { ApiErrorResponse, User } from "@tests/types";
 import { API_ENDPOINTS, ERROR_MESSAGES } from "@tests/constants";
@@ -174,7 +177,7 @@ test.describe("User Management Tests", () => {
 
   // Parameterized test for user creation with wrong values
   for (const testCase of USER_WRONG_VALUE_TEST_DATA) {
-    test.describe(`Wrong Values - ${testCase.caseId}`, () => {
+    test.describe(`${testCase.caseId}`, () => {
       test(`TC_USER_003 - User cannot create user with wrong value - ${testCase.caseId} @TC_USER_003`, async ({
         page,
         usersPage,
@@ -248,6 +251,488 @@ test.describe("User Management Tests", () => {
           expect(uiErrorText).toContain(apiErrorResponse.message);
 
           // Also verify it matches expected error pattern
+          const inputErrorMessage = page.getByText(testCase.expectedError);
+          expect(await inputErrorMessage.textContent()).toContain(
+            testCase.expectedError,
+          );
+        });
+      });
+    });
+  }
+
+  // Parameterized test for user editing
+  for (const testCase of USER_EDIT_TEST_DATA) {
+    test.describe(`${testCase.caseId}`, () => {
+      let testUser: User;
+
+      // Setup: Create a user before the test
+      test.beforeEach(async ({ page, usersPage }) => {
+        await test.step("Setup: Create test user via UI", async () => {
+          // Click "New Record" button
+          await usersPage.newRecordButton.click();
+
+          // Fill in user details
+          await usersPage.emailField.fill(testCase.originalEmail);
+          await usersPage.passwordField.fill(testCase.originalPassword);
+          await usersPage.passwordConfirmField.fill(testCase.originalPassword);
+
+          // Listen for API response to capture created user data
+          const [response] = await Promise.all([
+            page.waitForResponse(
+              (response) =>
+                response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
+                response.request().method() === "POST",
+              { timeout: 30000 },
+            ),
+            usersPage.createButton.click(),
+          ]);
+
+          // Capture created user data
+          testUser = await response.json();
+          expect(testUser.id).toBeDefined();
+          expect(testUser.email).toBe(testCase.originalEmail);
+        });
+      });
+
+      // Cleanup: Delete the user after the test
+      test.afterEach(async ({ usersPage }) => {
+        if (testUser && testUser.id) {
+          await test.step("Cleanup: Delete test user via UI", async () => {
+            try {
+              // Click the checkbox for the user
+              const deleteCheckbox = usersPage.getUserDeleteCheckbox(
+                testUser.id,
+              );
+              await deleteCheckbox.waitFor({ state: "visible", timeout: 5000 });
+              await deleteCheckbox.click();
+
+              // Click delete button
+              await usersPage.deleteButton.click();
+
+              // Listen for DELETE API response and confirm deletion
+              const [deleteResponse] = await Promise.all([
+                usersPage.page.waitForResponse(
+                  (response) =>
+                    response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
+                    response.request().method() === "DELETE",
+                  { timeout: 10000 },
+                ),
+                usersPage.confirmDeleteButton.click(),
+              ]);
+
+              // Verify DELETE API response
+              expect(deleteResponse.status()).toBe(204);
+
+              // Verify user is deleted from UI (wait for UI to update)
+              const userElement = await usersPage.getUserByEmail(
+                testUser.email,
+              );
+              await expect(userElement).not.toBeVisible({ timeout: 5000 });
+            } catch (error) {
+              console.warn(
+                `Failed to delete test user ${testUser.email}:`,
+                error,
+              );
+            }
+          });
+        }
+      });
+
+      test(`TC_USER_004 - User can edit user - @TC_USER_004`, async ({
+        page,
+        usersPage,
+      }) => {
+        test.info().annotations.push({
+          type: "description",
+          description: testCase.description,
+        });
+
+        let apiResponse: User;
+
+        await test.step(`User clicks the table data with title: "${testCase.originalEmail}"`, async () => {
+          await usersPage.editUserByEmail(testCase.originalEmail);
+        });
+
+        await test.step("Verify edit form is show to the screen", async () => {
+          const formHeading = page.getByRole("heading", {
+            name: "Edit users record",
+          });
+          await expect(formHeading).toBeVisible();
+        });
+
+        await test.step(`User focuses the email field and fills the value: "${testCase.newEmail}"`, async () => {
+          await usersPage.emailField.click();
+          await usersPage.emailField.fill(testCase.newEmail);
+          await expect(usersPage.emailField).toHaveValue(testCase.newEmail);
+        });
+
+        await test.step("User clicks the change password checkbox", async () => {
+          const changePasswordCheckbox = page.getByText("Change password");
+          await changePasswordCheckbox.click();
+        });
+
+        await test.step(`User focuses the password field and fills the value: "${testCase.newPassword}"`, async () => {
+          await usersPage.passwordField.click();
+          await usersPage.passwordField.fill(testCase.newPassword);
+          await expect(usersPage.passwordField).toHaveValue(
+            testCase.newPassword,
+          );
+        });
+
+        await test.step(`User focuses the password confirm field and fills the value: "${testCase.newPasswordConfirm}"`, async () => {
+          await usersPage.passwordConfirmField.click();
+          await usersPage.passwordConfirmField.fill(
+            testCase.newPasswordConfirm,
+          );
+          await expect(usersPage.passwordConfirmField).toHaveValue(
+            testCase.newPasswordConfirm,
+          );
+        });
+
+        await test.step('User clicks the "Save changes" button and verifies API response', async () => {
+          // Listen for API response before clicking
+          const [response] = await Promise.all([
+            page.waitForResponse(
+              (response) =>
+                response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
+                response.request().method() === "PATCH",
+              { timeout: 30000 },
+            ),
+            usersPage.saveChangesButton.click(),
+          ]);
+
+          // Capture API response
+          apiResponse = await response.json();
+
+          // Verify API response
+          expect(response.status()).toBe(200);
+          expect(apiResponse.email).toBe(testCase.newEmail);
+          expect(apiResponse.id).toBe(testUser.id);
+        });
+
+        await test.step("User can see the new updated user information on the list", async () => {
+          // Verify updated user appears in the UI
+          const userInList = await usersPage.getUserByEmail(testCase.newEmail);
+          await expect(userInList).toBeVisible();
+
+          // Verify UI data matches API response
+          await expect(userInList).toContainText(testCase.newEmail);
+        });
+
+        await test.step("Verify UI result matches API response", async () => {
+          // Verify API data matches what we updated
+          expect(apiResponse.email).toBe(testCase.newEmail);
+          expect(apiResponse.id).toBe(testUser.id);
+
+          // Verify UI shows the same data
+          const userInList = await usersPage.getUserByEmail(testCase.newEmail);
+          await expect(userInList).toContainText(apiResponse.email);
+
+          // Update testUser for cleanup
+          testUser = apiResponse;
+        });
+      });
+    });
+  }
+
+  // Parameterized test for user edit form validation with invalid values
+  for (const testCase of USER_EDIT_INVALID_TEST_DATA) {
+    test.describe(`Edit Form Validation - ${testCase.caseId}`, () => {
+      let testUser: User;
+
+      // Setup: Create a user before the test
+      test.beforeEach(async ({ page, usersPage }) => {
+        await test.step("Setup: Create test user via UI", async () => {
+          // Click "New Record" button
+          await usersPage.newRecordButton.click();
+
+          // Fill in user details
+          await usersPage.emailField.fill(testCase.originalEmail);
+          await usersPage.passwordField.fill(testCase.originalPassword);
+          await usersPage.passwordConfirmField.fill(testCase.originalPassword);
+
+          // Listen for API response to capture created user data
+          const [response] = await Promise.all([
+            page.waitForResponse(
+              (response) =>
+                response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
+                response.request().method() === "POST",
+              { timeout: 30000 },
+            ),
+            usersPage.createButton.click(),
+          ]);
+
+          // Capture created user data
+          testUser = await response.json();
+          expect(testUser.id).toBeDefined();
+          expect(testUser.email).toBe(testCase.originalEmail);
+        });
+      });
+
+      // Cleanup: Delete the user after the test
+      test.afterEach(async ({ usersPage }) => {
+        if (testUser && testUser.id) {
+          await test.step("Cleanup: Delete test user via UI", async () => {
+            try {
+              // Navigate to users page to ensure we're on the right page
+              await usersPage.navigateTo();
+
+              // Click the checkbox for the user
+              const deleteCheckbox = usersPage.getUserDeleteCheckbox(
+                testUser.id,
+              );
+              await deleteCheckbox.waitFor({ state: "visible", timeout: 5000 });
+              await deleteCheckbox.click();
+
+              // Click delete button
+              await usersPage.deleteButton.click();
+
+              // Listen for DELETE API response and confirm deletion
+              const [deleteResponse] = await Promise.all([
+                usersPage.page.waitForResponse(
+                  (response) =>
+                    response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
+                    response.request().method() === "DELETE",
+                  { timeout: 10000 },
+                ),
+                usersPage.confirmDeleteButton.click(),
+              ]);
+
+              // Verify DELETE API response
+              expect(deleteResponse.status()).toBe(204);
+
+              // Verify user is deleted from UI (wait for UI to update)
+              const userElement = await usersPage.getUserByEmail(
+                testUser.email,
+              );
+              await expect(userElement).not.toBeVisible({ timeout: 5000 });
+            } catch (error) {
+              console.warn(
+                `Failed to delete test user ${testUser.email}:`,
+                error,
+              );
+            }
+          });
+        }
+      });
+
+      test(`TC_USER_005 - User cannot submit edit user form with invalid value - ${testCase.caseId} @TC_USER_005`, async ({
+        page,
+        usersPage,
+      }) => {
+        test.info().annotations.push({
+          type: "description",
+          description: testCase.description,
+        });
+
+        await test.step(`User clicks the table data with title: "${testCase.originalEmail}"`, async () => {
+          await usersPage.editUserByEmail(testCase.originalEmail);
+        });
+
+        await test.step(`User focuses the email field and fills the value: "${testCase.newEmail || "(empty)"}"`, async () => {
+          await usersPage.emailField.click();
+          await usersPage.emailField.fill(testCase.newEmail);
+          await expect(usersPage.emailField).toHaveValue(testCase.newEmail);
+        });
+
+        await test.step("User clicks the change password checkbox", async () => {
+          const changePasswordCheckbox = page.getByText("Change password");
+          await changePasswordCheckbox.click();
+        });
+
+        await test.step(`User focuses the password field and fills the value: "${testCase.newPassword || "(empty)"}"`, async () => {
+          await usersPage.passwordField.click();
+          await usersPage.passwordField.fill(testCase.newPassword);
+          await expect(usersPage.passwordField).toHaveValue(
+            testCase.newPassword,
+          );
+        });
+
+        await test.step(`User focuses the password confirm field and fills the value: "${testCase.newPasswordConfirm || "(empty)"}"`, async () => {
+          await usersPage.passwordConfirmField.click();
+          await usersPage.passwordConfirmField.fill(
+            testCase.newPasswordConfirm,
+          );
+          await expect(usersPage.passwordConfirmField).toHaveValue(
+            testCase.newPasswordConfirm,
+          );
+        });
+
+        await test.step('User clicks the "Save changes" button', async () => {
+          await usersPage.saveChangesButton.click();
+        });
+
+        await test.step("User cannot submit the form", async () => {
+          // Verify we're still on the edit form (not navigated back to list)
+          await expect(usersPage.saveChangesButton).toBeVisible();
+        });
+      });
+    });
+  }
+
+  // Parameterized test for user edit with wrong values
+  for (const testCase of USER_EDIT_WRONG_VALUE_TEST_DATA) {
+    test.describe(`Edit Wrong Values - ${testCase.caseId}`, () => {
+      let testUser: User;
+
+      // Setup: Create a user before the test
+      test.beforeEach(async ({ page, usersPage }) => {
+        await test.step("Setup: Create test user via UI", async () => {
+          // Click "New Record" button
+          await usersPage.newRecordButton.click();
+
+          // Fill in user details
+          await usersPage.emailField.fill(testCase.originalEmail);
+          await usersPage.passwordField.fill(testCase.originalPassword);
+          await usersPage.passwordConfirmField.fill(testCase.originalPassword);
+
+          // Listen for API response to capture created user data
+          const [response] = await Promise.all([
+            page.waitForResponse(
+              (response) =>
+                response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
+                response.request().method() === "POST",
+              { timeout: 30000 },
+            ),
+            usersPage.createButton.click(),
+          ]);
+
+          // Capture created user data
+          testUser = await response.json();
+          expect(testUser.id).toBeDefined();
+          expect(testUser.email).toBe(testCase.originalEmail);
+        });
+      });
+
+      // Cleanup: Delete the user after the test
+      test.afterEach(async ({ usersPage }) => {
+        if (testUser && testUser.id) {
+          await test.step("Cleanup: Delete test user via UI", async () => {
+            try {
+              // Navigate to users page to ensure we're on the right page
+              await usersPage.navigateTo();
+
+              // Click the checkbox for the user
+              const deleteCheckbox = usersPage.getUserDeleteCheckbox(
+                testUser.id,
+              );
+              await deleteCheckbox.waitFor({ state: "visible", timeout: 5000 });
+              await deleteCheckbox.click();
+
+              // Click delete button
+              await usersPage.deleteButton.click();
+
+              // Listen for DELETE API response and confirm deletion
+              const [deleteResponse] = await Promise.all([
+                usersPage.page.waitForResponse(
+                  (response) =>
+                    response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
+                    response.request().method() === "DELETE",
+                  { timeout: 10000 },
+                ),
+                usersPage.confirmDeleteButton.click(),
+              ]);
+
+              // Verify DELETE API response
+              expect(deleteResponse.status()).toBe(204);
+
+              // Verify user is deleted from UI (wait for UI to update)
+              const userElement = await usersPage.getUserByEmail(
+                testUser.email,
+              );
+              await expect(userElement).not.toBeVisible({ timeout: 5000 });
+            } catch (error) {
+              console.warn(
+                `Failed to delete test user ${testUser.email}:`,
+                error,
+              );
+            }
+          });
+        }
+      });
+
+      test(`TC_USER_006 - User cannot submit edit user form with wrong value - ${testCase.caseId} @TC_USER_006`, async ({
+        page,
+        usersPage,
+      }) => {
+        test.info().annotations.push({
+          type: "description",
+          description: testCase.description,
+        });
+
+        let apiErrorResponse: ApiErrorResponse;
+
+        await test.step(`User clicks the table data with title: "${testCase.originalEmail}"`, async () => {
+          await usersPage.editUserByEmail(testCase.originalEmail);
+        });
+
+        await test.step(`User focuses the email field and fills the value: "${testCase.newEmail}"`, async () => {
+          await usersPage.emailField.focus();
+          await usersPage.emailField.fill(testCase.newEmail);
+          await expect(usersPage.emailField).toHaveValue(testCase.newEmail);
+        });
+
+        await test.step("User clicks the change password checkbox", async () => {
+          const changePasswordCheckbox = page.getByText("Change password");
+          await changePasswordCheckbox.click();
+        });
+
+        await test.step(`User focuses the password field and fills the value: "${testCase.newPassword}"`, async () => {
+          await usersPage.passwordField.focus();
+          await usersPage.passwordField.fill(testCase.newPassword);
+          await expect(usersPage.passwordField).toHaveValue(
+            testCase.newPassword,
+          );
+        });
+
+        await test.step(`User focuses the password confirm field and fills the value: "${testCase.newPasswordConfirm}"`, async () => {
+          await usersPage.passwordConfirmField.focus();
+          await usersPage.passwordConfirmField.fill(
+            testCase.newPasswordConfirm,
+          );
+          await expect(usersPage.passwordConfirmField).toHaveValue(
+            testCase.newPasswordConfirm,
+          );
+        });
+
+        await test.step('User clicks the "Save changes" button and receives error', async () => {
+          // Listen for API error response
+          const [response] = await Promise.all([
+            page.waitForResponse(
+              (response) =>
+                response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
+                response.request().method() === "PATCH",
+              { timeout: 30000 },
+            ),
+            usersPage.saveChangesButton.click(),
+          ]);
+
+          // Capture API error response
+          apiErrorResponse = await response.json();
+
+          // Verify API error response
+          expect(response.status()).toBe(400); // Bad Request for validation errors
+          expect(apiErrorResponse.message).toBeDefined();
+        });
+
+        await test.step("User can see error message and stays on edit form", async () => {
+          // Verify error message appears in UI
+          const errorMessage = page.getByText(ERROR_MESSAGES.UPDATE_FAIL);
+          await expect(errorMessage).toBeVisible({ timeout: 5000 });
+
+          // Verify we're still on the edit form
+          await expect(usersPage.saveChangesButton).toBeVisible();
+        });
+
+        await test.step("Verify UI error message matches API response", async () => {
+          // Get the error message from UI
+          const errorMessage = page.getByText(ERROR_MESSAGES.UPDATE_FAIL);
+          const uiErrorText = await errorMessage.textContent();
+
+          // Verify UI error message contains the API error message
+          expect(uiErrorText).toContain(apiErrorResponse.message);
+
+          // Also verify it matches input error message
           const inputErrorMessage = page.getByText(testCase.expectedError);
           expect(await inputErrorMessage.textContent()).toContain(
             testCase.expectedError,

@@ -69,3 +69,71 @@ export const USER_WRONG_VALUE_TEST_DATA = [
     expectedError: "Values don't match.",
   },
 ];
+export const USER_EDIT_TEST_DATA = [
+  {
+    caseId: "Case 1",
+    description: "Edit user email and password",
+    originalEmail: "testuseredit@example.com",
+    originalPassword: "123456789",
+    newEmail: "testuser1@example.com",
+    newPassword: "12345678",
+    newPasswordConfirm: "12345678",
+  },
+];
+
+export const USER_EDIT_INVALID_TEST_DATA = [
+  {
+    caseId: "Case 1",
+    description: "Email: (empty), Password: 12345678",
+    originalEmail: "testuseredit1@example.com",
+    originalPassword: "123456789",
+    newEmail: "",
+    newPassword: "12345678",
+    newPasswordConfirm: "12345678",
+  },
+  {
+    caseId: "Case 2",
+    description:
+      "Email: testuseredit2@example.com, Password: (empty), Password Confirm: 12345678",
+    originalEmail: "testuseredit2@example.com",
+    originalPassword: "123456789",
+    newEmail: "testuseredit2@example.com",
+    newPassword: "",
+    newPasswordConfirm: "12345678",
+  },
+  {
+    caseId: "Case 3",
+    description:
+      "Email: testuseredit3@example.com, Password: 12345678, Password Confirm: (empty)",
+    originalEmail: "testuseredit3@example.com",
+    originalPassword: "123456789",
+    newEmail: "testuseredit3@example.com",
+    newPassword: "12345678",
+    newPasswordConfirm: "",
+  },
+];
+
+export const USER_EDIT_WRONG_VALUE_TEST_DATA = [
+  {
+    caseId: "Case 1",
+    description:
+      "Email: testuseredit4@example.com, Password: 123456, Password Confirm: 123456",
+    originalEmail: "testuseredit4@example.com",
+    originalPassword: "123456789",
+    newEmail: "testuseredit4@example.com",
+    newPassword: "123456",
+    newPasswordConfirm: "123456",
+    expectedError: "Must be at least 8 character(s).",
+  },
+  {
+    caseId: "Case 2",
+    description:
+      "Email: testuseredit5@example.com, Password: 123456789, Password Confirm: 12345678",
+    originalEmail: "testuseredit5@example.com",
+    originalPassword: "123456789",
+    newEmail: "testuseredit5@example.com",
+    newPassword: "123456789",
+    newPasswordConfirm: "12345678",
+    expectedError: "Values don't match.",
+  },
+];
