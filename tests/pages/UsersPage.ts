@@ -7,6 +7,7 @@ export class UsersPage extends BasePage {
   readonly passwordField: Locator;
   readonly passwordConfirmField: Locator;
   readonly createButton: Locator;
+  readonly saveChangesButton: Locator;
   readonly usersList: Locator;
   readonly deleteButton: Locator;
   readonly confirmDeleteButton: Locator;
@@ -20,13 +21,14 @@ export class UsersPage extends BasePage {
       name: " Password confirm *",
     });
     this.createButton = page.getByRole("button", { name: "Create" });
+    this.saveChangesButton = page.getByRole("button", { name: "Save changes" });
     this.usersList = page.locator(".list-item");
     this.deleteButton = page.getByRole("button", { name: "Delete selected" });
     this.confirmDeleteButton = page.getByRole("button", { name: "Yes" });
   }
 
   async navigateTo() {
-    await this.page.goto("#/collections/users");
+    await this.page.goto("");
   }
 
   async createUser(email: string, password: string, passwordConfirm: string) {
@@ -52,5 +54,17 @@ export class UsersPage extends BasePage {
 
   getUserDeleteCheckbox(id: string) {
     return this.page.locator(`label[for="checkbox_${id}"]`);
+  }
+
+  async editUserByEmail(email: string) {
+    const userRow = await this.getUserByEmail(email);
+    await userRow.click();
+  }
+
+  async updateUser(email: string, password: string, passwordConfirm: string) {
+    await this.emailField.fill(email);
+    await this.passwordField.fill(password);
+    await this.passwordConfirmField.fill(passwordConfirm);
+    await this.saveChangesButton.click();
   }
 }
