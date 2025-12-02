@@ -5,7 +5,6 @@ import { DashboardPage } from "@tests/pages/DashboardPage";
 type AuthFixtures = {
   loginPage: LoginPage;
   dashboardPage: DashboardPage;
-  authenticatedPage: { loginPage: LoginPage; dashboardPage: DashboardPage };
 };
 
 export const test = base.extend<AuthFixtures>({

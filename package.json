@@ -9,6 +9,7 @@
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:tc": "playwright test --grep",
+    "test:users": "playwright test --grep ",
     "report": "playwright show-report"
   },
   "keywords": [],
