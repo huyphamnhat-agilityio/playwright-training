@@ -3,3 +3,9 @@ export const ERROR_MESSAGES = {
   CREATE_FAIL: "Failed to create record.",
   UPDATE_FAIL: "Failed to update record.",
 };
+
+export const SUCCESS_MESSAGES = {
+  CREATE_SUCCESS: "Successfully created record.",
+  UPDATE_SUCCESS: "Successfully updated record.",
+  DELETE_SUCCESS: "Successfully deleted the",
+};

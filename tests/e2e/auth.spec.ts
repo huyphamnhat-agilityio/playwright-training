@@ -9,6 +9,8 @@ import {
 } from "@tests/constants";
 
 test.describe("Authentication Tests", () => {
+  test.slow();
+
   test("TC_AUTH_001 - User can login with right username and password @TC_AUTH_001", async ({
     page,
     loginPage,
@@ -86,6 +88,7 @@ test.describe("Authentication Tests", () => {
     test(`TC_AUTH_003 - User cannot login with wrong credentials - ${testCase.caseId} @TC_AUTH_003   `, async ({
       loginPage,
     }) => {
+      test.slow();
       test.info().annotations.push({
         type: "description",
         description: testCase.description,
