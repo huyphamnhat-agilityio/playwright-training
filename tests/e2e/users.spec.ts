@@ -5,12 +5,14 @@ import {
   USER_WRONG_VALUE_TEST_DATA,
   USER_EDIT_TEST_DATA,
   USER_EDIT_INVALID_TEST_DATA,
+  USER_DELETE_TEST_DATA,
   USER_EDIT_WRONG_VALUE_TEST_DATA,
 } from "@tests/constants/user-test-data";
 import { ApiErrorResponse, User } from "@tests/types";
-import { API_ENDPOINTS, ERROR_MESSAGES } from "@tests/constants";
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "@tests/constants";
 
 test.describe("User Management Tests", () => {
+  test.slow();
   // Parameterized test for user creation
   for (const testCase of USER_CREATION_TEST_DATA) {
     test.describe(`${testCase.caseId}`, () => {
@@ -28,18 +30,18 @@ test.describe("User Management Tests", () => {
               await usersPage.deleteButton.click();
 
               // Listen for DELETE API response and confirm deletion
-              const [deleteResponse] = await Promise.all([
-                usersPage.page.waitForResponse(
-                  (response) =>
-                    response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
-                    response.request().method() === "DELETE",
-                  { timeout: 10000 },
-                ),
-                usersPage.confirmDeleteButton.click(),
-              ]);
+              const deleteResponse = await usersPage.waitForApiResponse(
+                "DELETE",
+                async () => await usersPage.confirmDeleteButton.click(),
+              );
 
               // Verify DELETE API response
               expect(deleteResponse.status()).toBe(204); // 204 No Content is typical for successful DELETE
+
+              // Verify success message appears
+              await usersPage.verifySuccessMessage(
+                SUCCESS_MESSAGES.DELETE_SUCCESS,
+              );
 
               // Verify user is deleted from UI (wait for UI to update)
               const userElement = await usersPage.getUserByEmail(
@@ -57,9 +59,10 @@ test.describe("User Management Tests", () => {
       });
 
       test(`TC_USER_001 - User can create a user with valid value - ${testCase.caseId} @TC_USER_001`, async ({
-        page,
         usersPage,
       }) => {
+        test.slow();
+
         test.info().annotations.push({
           type: "description",
           description: testCase.description,
@@ -91,15 +94,10 @@ test.describe("User Management Tests", () => {
 
         await test.step('User clicks the "Create" button and verifies API response', async () => {
           // Listen for API response before clicking
-          const [response] = await Promise.all([
-            page.waitForResponse(
-              (response) =>
-                response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
-                response.request().method() === "POST",
-              { timeout: 30000 },
-            ),
-            usersPage.createButton.click(),
-          ]);
+          const response = await usersPage.waitForApiResponse(
+            "POST",
+            async () => await usersPage.createButton.click(),
+          );
 
           // Capture API response
           createdUser = await response.json();
@@ -111,6 +109,9 @@ test.describe("User Management Tests", () => {
         });
 
         await test.step("User can see the new user on the list", async () => {
+          // Verify success message appears
+          await usersPage.verifySuccessMessage(SUCCESS_MESSAGES.CREATE_SUCCESS);
+
           // Verify user appears in the UI
           const userInList = await usersPage.getUserByEmail(testCase.email);
           await expect(userInList).toBeVisible();
@@ -182,6 +183,7 @@ test.describe("User Management Tests", () => {
         page,
         usersPage,
       }) => {
+        test.slow();
         test.info().annotations.push({
           type: "description",
           description: testCase.description,
@@ -215,15 +217,10 @@ test.describe("User Management Tests", () => {
 
         await test.step('User clicks the "Create" button and receives error', async () => {
           // Listen for API error response
-          const [response] = await Promise.all([
-            page.waitForResponse(
-              (response) =>
-                response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
-                response.request().method() === "POST",
-              { timeout: 30000 },
-            ),
-            usersPage.createButton.click(),
-          ]);
+          const response = await usersPage.waitForApiResponse(
+            "POST",
+            async () => await usersPage.createButton.click(),
+          );
 
           // Capture API error response
           apiErrorResponse = await response.json();
@@ -266,29 +263,12 @@ test.describe("User Management Tests", () => {
       let testUser: User;
 
       // Setup: Create a user before the test
-      test.beforeEach(async ({ page, usersPage }) => {
+      test.beforeEach(async ({ usersPage }) => {
         await test.step("Setup: Create test user via UI", async () => {
-          // Click "New Record" button
-          await usersPage.newRecordButton.click();
-
-          // Fill in user details
-          await usersPage.emailField.fill(testCase.originalEmail);
-          await usersPage.passwordField.fill(testCase.originalPassword);
-          await usersPage.passwordConfirmField.fill(testCase.originalPassword);
-
-          // Listen for API response to capture created user data
-          const [response] = await Promise.all([
-            page.waitForResponse(
-              (response) =>
-                response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
-                response.request().method() === "POST",
-              { timeout: 30000 },
-            ),
-            usersPage.createButton.click(),
-          ]);
-
-          // Capture created user data
-          testUser = await response.json();
+          testUser = await usersPage.createUserViaUI(
+            testCase.originalEmail,
+            testCase.originalPassword,
+          );
           expect(testUser.id).toBeDefined();
           expect(testUser.email).toBe(testCase.originalEmail);
         });
@@ -310,15 +290,10 @@ test.describe("User Management Tests", () => {
               await usersPage.deleteButton.click();
 
               // Listen for DELETE API response and confirm deletion
-              const [deleteResponse] = await Promise.all([
-                usersPage.page.waitForResponse(
-                  (response) =>
-                    response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
-                    response.request().method() === "DELETE",
-                  { timeout: 10000 },
-                ),
-                usersPage.confirmDeleteButton.click(),
-              ]);
+              const deleteResponse = await usersPage.waitForApiResponse(
+                "DELETE",
+                async () => await usersPage.confirmDeleteButton.click(),
+              );
 
               // Verify DELETE API response
               expect(deleteResponse.status()).toBe(204);
@@ -367,8 +342,7 @@ test.describe("User Management Tests", () => {
         });
 
         await test.step("User clicks the change password checkbox", async () => {
-          const changePasswordCheckbox = page.getByText("Change password");
-          await changePasswordCheckbox.click();
+          await usersPage.clickChangePasswordCheckbox();
         });
 
         await test.step(`User focuses the password field and fills the value: "${testCase.newPassword}"`, async () => {
@@ -391,15 +365,10 @@ test.describe("User Management Tests", () => {
 
         await test.step('User clicks the "Save changes" button and verifies API response', async () => {
           // Listen for API response before clicking
-          const [response] = await Promise.all([
-            page.waitForResponse(
-              (response) =>
-                response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
-                response.request().method() === "PATCH",
-              { timeout: 30000 },
-            ),
-            usersPage.saveChangesButton.click(),
-          ]);
+          const response = await usersPage.waitForApiResponse(
+            "PATCH",
+            async () => await usersPage.saveChangesButton.click(),
+          );
 
           // Capture API response
           apiResponse = await response.json();
@@ -411,6 +380,9 @@ test.describe("User Management Tests", () => {
         });
 
         await test.step("User can see the new updated user information on the list", async () => {
+          // Verify success message appears
+          await usersPage.verifySuccessMessage(SUCCESS_MESSAGES.UPDATE_SUCCESS);
+
           // Verify updated user appears in the UI
           const userInList = await usersPage.getUserByEmail(testCase.newEmail);
           await expect(userInList).toBeVisible();
@@ -441,29 +413,12 @@ test.describe("User Management Tests", () => {
       let testUser: User;
 
       // Setup: Create a user before the test
-      test.beforeEach(async ({ page, usersPage }) => {
+      test.beforeEach(async ({ usersPage }) => {
         await test.step("Setup: Create test user via UI", async () => {
-          // Click "New Record" button
-          await usersPage.newRecordButton.click();
-
-          // Fill in user details
-          await usersPage.emailField.fill(testCase.originalEmail);
-          await usersPage.passwordField.fill(testCase.originalPassword);
-          await usersPage.passwordConfirmField.fill(testCase.originalPassword);
-
-          // Listen for API response to capture created user data
-          const [response] = await Promise.all([
-            page.waitForResponse(
-              (response) =>
-                response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
-                response.request().method() === "POST",
-              { timeout: 30000 },
-            ),
-            usersPage.createButton.click(),
-          ]);
-
-          // Capture created user data
-          testUser = await response.json();
+          testUser = await usersPage.createUserViaUI(
+            testCase.originalEmail,
+            testCase.originalPassword,
+          );
           expect(testUser.id).toBeDefined();
           expect(testUser.email).toBe(testCase.originalEmail);
         });
@@ -488,15 +443,10 @@ test.describe("User Management Tests", () => {
               await usersPage.deleteButton.click();
 
               // Listen for DELETE API response and confirm deletion
-              const [deleteResponse] = await Promise.all([
-                usersPage.page.waitForResponse(
-                  (response) =>
-                    response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
-                    response.request().method() === "DELETE",
-                  { timeout: 10000 },
-                ),
-                usersPage.confirmDeleteButton.click(),
-              ]);
+              const deleteResponse = await usersPage.waitForApiResponse(
+                "DELETE",
+                async () => await usersPage.confirmDeleteButton.click(),
+              );
 
               // Verify DELETE API response
               expect(deleteResponse.status()).toBe(204);
@@ -517,7 +467,6 @@ test.describe("User Management Tests", () => {
       });
 
       test(`TC_USER_005 - User cannot submit edit user form with invalid value - ${testCase.caseId} @TC_USER_005`, async ({
-        page,
         usersPage,
       }) => {
         test.info().annotations.push({
@@ -536,8 +485,7 @@ test.describe("User Management Tests", () => {
         });
 
         await test.step("User clicks the change password checkbox", async () => {
-          const changePasswordCheckbox = page.getByText("Change password");
-          await changePasswordCheckbox.click();
+          await usersPage.clickChangePasswordCheckbox();
         });
 
         await test.step(`User focuses the password field and fills the value: "${testCase.newPassword || "(empty)"}"`, async () => {
@@ -576,29 +524,12 @@ test.describe("User Management Tests", () => {
       let testUser: User;
 
       // Setup: Create a user before the test
-      test.beforeEach(async ({ page, usersPage }) => {
+      test.beforeEach(async ({ usersPage }) => {
         await test.step("Setup: Create test user via UI", async () => {
-          // Click "New Record" button
-          await usersPage.newRecordButton.click();
-
-          // Fill in user details
-          await usersPage.emailField.fill(testCase.originalEmail);
-          await usersPage.passwordField.fill(testCase.originalPassword);
-          await usersPage.passwordConfirmField.fill(testCase.originalPassword);
-
-          // Listen for API response to capture created user data
-          const [response] = await Promise.all([
-            page.waitForResponse(
-              (response) =>
-                response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
-                response.request().method() === "POST",
-              { timeout: 30000 },
-            ),
-            usersPage.createButton.click(),
-          ]);
-
-          // Capture created user data
-          testUser = await response.json();
+          testUser = await usersPage.createUserViaUI(
+            testCase.originalEmail,
+            testCase.originalPassword,
+          );
           expect(testUser.id).toBeDefined();
           expect(testUser.email).toBe(testCase.originalEmail);
         });
@@ -623,15 +554,10 @@ test.describe("User Management Tests", () => {
               await usersPage.deleteButton.click();
 
               // Listen for DELETE API response and confirm deletion
-              const [deleteResponse] = await Promise.all([
-                usersPage.page.waitForResponse(
-                  (response) =>
-                    response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
-                    response.request().method() === "DELETE",
-                  { timeout: 10000 },
-                ),
-                usersPage.confirmDeleteButton.click(),
-              ]);
+              const deleteResponse = await usersPage.waitForApiResponse(
+                "DELETE",
+                async () => await usersPage.confirmDeleteButton.click(),
+              );
 
               // Verify DELETE API response
               expect(deleteResponse.status()).toBe(204);
@@ -673,8 +599,7 @@ test.describe("User Management Tests", () => {
         });
 
         await test.step("User clicks the change password checkbox", async () => {
-          const changePasswordCheckbox = page.getByText("Change password");
-          await changePasswordCheckbox.click();
+          await usersPage.clickChangePasswordCheckbox();
         });
 
         await test.step(`User focuses the password field and fills the value: "${testCase.newPassword}"`, async () => {
@@ -697,15 +622,10 @@ test.describe("User Management Tests", () => {
 
         await test.step('User clicks the "Save changes" button and receives error', async () => {
           // Listen for API error response
-          const [response] = await Promise.all([
-            page.waitForResponse(
-              (response) =>
-                response.url().includes(API_ENDPOINTS.COLLECTIONS) &&
-                response.request().method() === "PATCH",
-              { timeout: 30000 },
-            ),
-            usersPage.saveChangesButton.click(),
-          ]);
+          const response = await usersPage.waitForApiResponse(
+            "PATCH",
+            async () => await usersPage.saveChangesButton.click(),
+          );
 
           // Capture API error response
           apiErrorResponse = await response.json();
@@ -737,6 +657,70 @@ test.describe("User Management Tests", () => {
           expect(await inputErrorMessage.textContent()).toContain(
             testCase.expectedError,
           );
+        });
+      });
+    });
+  }
+
+  // Parameterized test for user deletion
+  for (const testCase of USER_DELETE_TEST_DATA) {
+    test.describe(`Delete Users - ${testCase.caseId}`, () => {
+      let testUsers: User[] = [];
+
+      // Setup: Create multiple users before the test
+      test.beforeEach(async ({ usersPage }) => {
+        await test.step("Setup: Create test users via UI", async () => {
+          for (const userData of testCase.users) {
+            const user = await usersPage.createUserViaUI(
+              userData.email,
+              userData.password,
+            );
+            testUsers.push(user);
+          }
+          expect(testUsers.length).toBe(testCase.users.length);
+        });
+      });
+
+      test(`TC_USER_007 - User delete users @TC_USER_007 @users @delete`, async ({
+        usersPage,
+      }) => {
+        test.info().annotations.push({
+          type: "description",
+          description: testCase.description,
+        });
+
+        await test.step("User clicks the checkbox of users", async () => {
+          for (const user of testUsers) {
+            const deleteCheckbox = usersPage.getUserDeleteCheckbox(user.id);
+            await deleteCheckbox.waitFor({ state: "visible", timeout: 5000 });
+            await deleteCheckbox.click();
+          }
+        });
+
+        await test.step('User clicks the "Delete selected" button in the bottom popup modal', async () => {
+          await usersPage.deleteButton.click();
+        });
+
+        await test.step('User clicks the "Yes" button in the confirm modal', async () => {
+          // Listen for DELETE API response
+          const deleteResponse = await usersPage.waitForApiResponse(
+            "DELETE",
+            async () => await usersPage.confirmDeleteButton.click(),
+          );
+
+          // Verify DELETE API response
+          expect(deleteResponse.status()).toBe(204);
+
+          // Verify success message appears
+          await usersPage.verifySuccessMessage(SUCCESS_MESSAGES.DELETE_SUCCESS);
+        });
+
+        await test.step("User cannot see the information of deleted users in the list", async () => {
+          // Verify all users are deleted from UI
+          for (const user of testUsers) {
+            const userElement = await usersPage.getUserByEmail(user.email);
+            await expect(userElement).not.toBeVisible({ timeout: 5000 });
+          }
         });
       });
     });

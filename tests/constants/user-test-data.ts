@@ -113,6 +113,23 @@ export const USER_EDIT_INVALID_TEST_DATA = [
   },
 ];
 
+export const USER_DELETE_TEST_DATA = [
+  {
+    caseId: "Case 1",
+    description: "Delete multiple users",
+    users: [
+      {
+        email: "testdelete1@example.com",
+        password: "123456789",
+      },
+      {
+        email: "testdelete2@example.com",
+        password: "123456789",
+      },
+    ],
+  },
+];
+
 export const USER_EDIT_WRONG_VALUE_TEST_DATA = [
   {
     caseId: "Case 1",
