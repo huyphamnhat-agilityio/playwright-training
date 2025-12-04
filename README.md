@@ -55,11 +55,11 @@ Create a `.env` file in the root directory with the following variables:
 BASE_URL=https://pocketbase.io/_/
 TEST_EMAIL=test@example.com
 TEST_PASSWORD=123456
+```
 
 ## Project Structure
 
 ```
-
 .
 ├── tests/
 │ ├── config/
@@ -100,8 +100,7 @@ TEST_PASSWORD=123456
 ├── pnpm-lock.yaml # PNPM lock file
 ├── tsconfig.json # TypeScript configuration
 └── vercel.json # Vercel deployment config
-
-````
+```
 
 ## Authentication Setup
 
@@ -134,7 +133,7 @@ pnpm test:ui
 
 # View test report
 pnpm report
-````
+```
 
 ## Test Cases
 
