@@ -174,9 +174,9 @@ export const USER_SORT_TEST_DATA = [
     sortLocator: "username",
 
     testUsers: [
-      { email: "user3@example.com", password: "testpass123" },
-      { email: "user1@example.com", password: "testpass123" },
-      { email: "user2@example.com", password: "testpass123" },
+      { email: "usersort3@example.com", password: "testpass123" },
+      { email: "usersort1@example.com", password: "testpass123" },
+      { email: "usersort2@example.com", password: "testpass123" },
     ],
   },
   {
