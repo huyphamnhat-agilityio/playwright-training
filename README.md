@@ -75,7 +75,10 @@ TEST_PASSWORD=123456
 │ ├── e2e/
 │ │ ├── auth.setup.ts # Global authentication setup
 │ │ ├── auth.spec.ts # Authentication tests
-│ │ └── users.spec.ts # User management tests
+│ │ ├── users-create.spec.ts # User creation tests (TC_USER_001-003)
+│ │ ├── users-edit.spec.ts # User edit tests (TC_USER_004-006)
+│ │ ├── users-delete.spec.ts # User deletion tests (TC_USER_007)
+│ │ └── users-sort.spec.ts # User sorting tests (TC_USER_008)
 │ ├── fixtures/
 │ │ ├── auth.fixture.ts # Authentication fixtures
 │ │ └── users.fixture.ts # User management fixtures
