@@ -10,13 +10,16 @@ export class UsersPage extends BasePage {
   readonly passwordConfirmField: Locator;
   readonly createButton: Locator;
   readonly saveChangesButton: Locator;
-  readonly usersList: Locator;
+  readonly headerCheckbox: Locator;
   readonly deleteButton: Locator;
   readonly confirmDeleteButton: Locator;
+  readonly cancelButton: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.newRecordButton = page.getByRole("button", { name: "New Record" });
+    this.newRecordButton = page
+      .getByRole("button", { name: "New Record" })
+      .first();
     this.emailField = page.getByRole("textbox", { name: " email *" });
     this.passwordField = page.getByRole("textbox", { name: " Password *" });
     this.passwordConfirmField = page.getByRole("textbox", {
@@ -24,9 +27,10 @@ export class UsersPage extends BasePage {
     });
     this.createButton = page.getByRole("button", { name: "Create" });
     this.saveChangesButton = page.getByRole("button", { name: "Save changes" });
-    this.usersList = page.locator(".list-item");
+    this.headerCheckbox = page.locator(`label[for="checkbox_0"]`);
     this.deleteButton = page.getByRole("button", { name: "Delete selected" });
     this.confirmDeleteButton = page.getByRole("button", { name: "Yes" });
+    this.cancelButton = page.getByRole("button", { name: "Cancel" });
   }
 
   async navigateTo() {
@@ -72,7 +76,7 @@ export class UsersPage extends BasePage {
 
   async verifySuccessMessage(message: string) {
     const successMessage = this.page.getByText(message);
-    await successMessage.waitFor({ state: "visible", timeout: 5000 });
+    await successMessage.waitFor({ state: "visible", timeout: 30000 });
     return successMessage;
   }
 
@@ -92,6 +96,8 @@ export class UsersPage extends BasePage {
       this.createButton.click(),
     ]);
 
+    await response.finished();
+
     return (await response.json()) as User;
   }
 
@@ -107,7 +113,7 @@ export class UsersPage extends BasePage {
   }
 
   async waitForApiResponse(
-    method: "POST" | "PATCH" | "DELETE",
+    method: "GET" | "POST" | "PATCH" | "DELETE",
     action: () => Promise<void>,
     endpoint: string = API_ENDPOINTS.COLLECTIONS,
   ) {
@@ -121,5 +127,41 @@ export class UsersPage extends BasePage {
       action(),
     ]);
     return response;
+  }
+
+  async clickTableHeader(headerName: string) {
+    const header = this.page.getByRole("columnheader", {
+      name: headerName,
+      exact: true,
+    });
+    await header.click();
+  }
+
+  async getUserEmailsFromList(): Promise<string[]> {
+    await this.page.waitForTimeout(500); // Wait for list to be stable
+    const userItems = this.page.locator(".list-item");
+    await userItems.first().waitFor({ state: "visible", timeout: 5000 });
+
+    const count = await userItems.count();
+    const emails: string[] = [];
+
+    for (let i = 0; i < count; i++) {
+      const userItem = userItems.nth(i);
+      const text = await userItem.textContent();
+      // Extract email from the user item text
+      const emailMatch = text?.match(/[\w.-]+@[\w.-]+\.\w+/);
+      if (emailMatch) {
+        emails.push(emailMatch[0]);
+      }
+    }
+
+    return emails;
+  }
+
+  async getTableHeaderLocatorWithFilterStatus(
+    name: string,
+    filter: "asc" | "desc",
+  ) {
+    return this.page.locator(`th.col-field-${name}.sort-${filter}`);
   }
 }

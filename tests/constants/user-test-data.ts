@@ -154,3 +154,40 @@ export const USER_EDIT_WRONG_VALUE_TEST_DATA = [
     expectedError: "Values don't match.",
   },
 ];
+
+export const USER_SORT_TEST_DATA = [
+  {
+    caseId: "Case 1",
+    description: "Sort users by email",
+    sortField: " email ",
+    sortLocator: "email",
+    testUsers: [
+      { email: "charlie@example.com", password: "testpass123" },
+      { email: "alice@example.com", password: "testpass123" },
+      { email: "bob@example.com", password: "testpass123" },
+    ],
+  },
+  {
+    caseId: "Case 2",
+    description: "Sort users by username",
+    sortField: " username ",
+    sortLocator: "username",
+
+    testUsers: [
+      { email: "user3@example.com", password: "testpass123" },
+      { email: "user1@example.com", password: "testpass123" },
+      { email: "user2@example.com", password: "testpass123" },
+    ],
+  },
+  {
+    caseId: "Case 3",
+    description: "Sort users by created date",
+    sortField: " created ",
+    sortLocator: "created",
+    testUsers: [
+      { email: "newest@example.com", password: "testpass123" },
+      { email: "oldest@example.com", password: "testpass123" },
+      { email: "middle@example.com", password: "testpass123" },
+    ],
+  },
+];

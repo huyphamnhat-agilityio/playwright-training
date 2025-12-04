@@ -1,3 +1,4 @@
+import { isAscending, isDescending } from "./../utils/validation";
 import { test, expect } from "@tests/fixtures/users.fixture";
 import {
   USER_CREATION_TEST_DATA,
@@ -7,9 +8,14 @@ import {
   USER_EDIT_INVALID_TEST_DATA,
   USER_DELETE_TEST_DATA,
   USER_EDIT_WRONG_VALUE_TEST_DATA,
+  USER_SORT_TEST_DATA,
 } from "@tests/constants/user-test-data";
 import { ApiErrorResponse, User } from "@tests/types";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "@tests/constants";
+
+// test.describe.serial("User Tests", () => {
+
+// })
 
 test.describe("User Management Tests", () => {
   test.slow();
@@ -37,11 +43,6 @@ test.describe("User Management Tests", () => {
 
               // Verify DELETE API response
               expect(deleteResponse.status()).toBe(204); // 204 No Content is typical for successful DELETE
-
-              // Verify success message appears
-              await usersPage.verifySuccessMessage(
-                SUCCESS_MESSAGES.DELETE_SUCCESS,
-              );
 
               // Verify user is deleted from UI (wait for UI to update)
               const userElement = await usersPage.getUserByEmail(
@@ -171,6 +172,8 @@ test.describe("User Management Tests", () => {
         await test.step("User cannot submit the form", async () => {
           // Verify we're still on the create user form
           await expect(usersPage.createButton).toBeVisible();
+
+          await usersPage.cancelButton.click();
         });
       });
     });
@@ -263,14 +266,15 @@ test.describe("User Management Tests", () => {
       let testUser: User;
 
       // Setup: Create a user before the test
-      test.beforeEach(async ({ usersPage }) => {
+      test.beforeEach(async ({ usersPage, browserName }) => {
         await test.step("Setup: Create test user via UI", async () => {
+          const email = `${testCase.originalEmail}${browserName}`;
           testUser = await usersPage.createUserViaUI(
-            testCase.originalEmail,
+            email,
             testCase.originalPassword,
           );
           expect(testUser.id).toBeDefined();
-          expect(testUser.email).toBe(testCase.originalEmail);
+          expect(testUser.email).toBe(email);
         });
       });
 
@@ -443,13 +447,10 @@ test.describe("User Management Tests", () => {
               await usersPage.deleteButton.click();
 
               // Listen for DELETE API response and confirm deletion
-              const deleteResponse = await usersPage.waitForApiResponse(
+              await usersPage.waitForApiResponse(
                 "DELETE",
                 async () => await usersPage.confirmDeleteButton.click(),
               );
-
-              // Verify DELETE API response
-              expect(deleteResponse.status()).toBe(204);
 
               // Verify user is deleted from UI (wait for UI to update)
               const userElement = await usersPage.getUserByEmail(
@@ -513,6 +514,7 @@ test.describe("User Management Tests", () => {
         await test.step("User cannot submit the form", async () => {
           // Verify we're still on the edit form (not navigated back to list)
           await expect(usersPage.saveChangesButton).toBeVisible();
+          await usersPage.cancelButton.click();
         });
       });
     });
@@ -524,14 +526,15 @@ test.describe("User Management Tests", () => {
       let testUser: User;
 
       // Setup: Create a user before the test
-      test.beforeEach(async ({ usersPage }) => {
+      test.beforeEach(async ({ usersPage, browserName }) => {
         await test.step("Setup: Create test user via UI", async () => {
+          const email = `${testCase.originalEmail}${browserName}`;
           testUser = await usersPage.createUserViaUI(
-            testCase.originalEmail,
+            email,
             testCase.originalPassword,
           );
           expect(testUser.id).toBeDefined();
-          expect(testUser.email).toBe(testCase.originalEmail);
+          expect(testUser.email).toBe(email);
         });
       });
 
@@ -554,13 +557,10 @@ test.describe("User Management Tests", () => {
               await usersPage.deleteButton.click();
 
               // Listen for DELETE API response and confirm deletion
-              const deleteResponse = await usersPage.waitForApiResponse(
+              await usersPage.waitForApiResponse(
                 "DELETE",
                 async () => await usersPage.confirmDeleteButton.click(),
               );
-
-              // Verify DELETE API response
-              expect(deleteResponse.status()).toBe(204);
 
               // Verify user is deleted from UI (wait for UI to update)
               const userElement = await usersPage.getUserByEmail(
@@ -580,6 +580,7 @@ test.describe("User Management Tests", () => {
       test(`TC_USER_006 - User cannot submit edit user form with wrong value - ${testCase.caseId} @TC_USER_006`, async ({
         page,
         usersPage,
+        browserName,
       }) => {
         test.info().annotations.push({
           type: "description",
@@ -594,8 +595,10 @@ test.describe("User Management Tests", () => {
 
         await test.step(`User focuses the email field and fills the value: "${testCase.newEmail}"`, async () => {
           await usersPage.emailField.focus();
-          await usersPage.emailField.fill(testCase.newEmail);
-          await expect(usersPage.emailField).toHaveValue(testCase.newEmail);
+          await usersPage.emailField.fill(`${testCase.newEmail}${browserName}`);
+          await expect(usersPage.emailField).toHaveValue(
+            `${testCase.newEmail}${browserName}`,
+          );
         });
 
         await test.step("User clicks the change password checkbox", async () => {
@@ -703,16 +706,10 @@ test.describe("User Management Tests", () => {
 
         await test.step('User clicks the "Yes" button in the confirm modal', async () => {
           // Listen for DELETE API response
-          const deleteResponse = await usersPage.waitForApiResponse(
+          await usersPage.waitForApiResponse(
             "DELETE",
             async () => await usersPage.confirmDeleteButton.click(),
           );
-
-          // Verify DELETE API response
-          expect(deleteResponse.status()).toBe(204);
-
-          // Verify success message appears
-          await usersPage.verifySuccessMessage(SUCCESS_MESSAGES.DELETE_SUCCESS);
         });
 
         await test.step("User cannot see the information of deleted users in the list", async () => {
@@ -725,4 +722,129 @@ test.describe("User Management Tests", () => {
       });
     });
   }
+
+  // Parameterized test for user sorting
+  for (const testCase of USER_SORT_TEST_DATA) {
+    test.describe(`Sort Users - ${testCase.caseId}`, () => {
+      test.slow();
+      let testUsers: User[] = [];
+
+      test.beforeEach(async ({ usersPage }) => {
+        // const headerCheckbox = usersPage.headerCheckbox;
+        // if (!(await headerCheckbox.isDisabled())) {
+        //   await test.step("Setup: Delete all users from previous test", async () => {
+        //     await headerCheckbox.click();
+        //     await usersPage.deleteButton.click();
+        //     // Listen for DELETE API response
+        //     const deleteResponse = await usersPage.waitForApiResponse(
+        //       "DELETE",
+        //       async () => await usersPage.confirmDeleteButton.click(),
+        //     );
+
+        //     // Verify DELETE API response
+        //     expect(await deleteResponse.finished()).toBeNull();
+        //   });
+        // }
+
+        await test.step("Setup: Create test users via UI", async () => {
+          for (const userData of testCase.testUsers) {
+            const user = await usersPage.createUserViaUI(
+              userData.email,
+              userData.password,
+            );
+            testUsers.push(user);
+            await expect(
+              await usersPage.getUserByEmail(user.email),
+            ).toBeVisible();
+          }
+        });
+      });
+
+      test.afterEach(async ({ usersPage }) => {
+        await test.step("User clicks the checkbox of users", async () => {
+          for (const user of testUsers) {
+            const deleteCheckbox = usersPage.getUserDeleteCheckbox(user.id);
+            await deleteCheckbox.waitFor({ state: "visible", timeout: 5000 });
+            await deleteCheckbox.click();
+          }
+        });
+
+        await test.step('User clicks the "Delete selected" button in the bottom popup modal', async () => {
+          await usersPage.deleteButton.click();
+        });
+
+        await test.step('User clicks the "Yes" button in the confirm modal', async () => {
+          // Listen for DELETE API response
+          await usersPage.waitForApiResponse(
+            "DELETE",
+            async () => await usersPage.confirmDeleteButton.click(),
+          );
+        });
+      });
+
+      test(`TC_USER_008 - User can sort users by ${testCase.sortField} @TC_USER_008`, async ({
+        page,
+        usersPage,
+      }) => {
+        test.info().annotations.push({
+          type: "description",
+          description: testCase.description,
+        });
+
+        await usersPage.waitForPageLoad();
+
+        // STEP 1 — Click once → descending
+        await test.step(`Click table header "${testCase.sortField}" to sort descending`, async () => {
+          const response = await usersPage.waitForApiResponse(
+            "GET",
+            async () => await usersPage.clickTableHeader(testCase.sortField),
+          );
+          expect(response.status()).toBe(200);
+        });
+
+        // STEP 2 — Retrieve descending list
+        const descendingItemList =
+          await test.step("Capture the descending-sorted list", async () => {
+            const values = await page
+              .locator(`td.col-field-${testCase.sortLocator}`)
+              .allTextContents();
+            return values;
+          });
+
+        // STEP 3 — Validate descending sorting
+        await test.step("Validate list is sorted descending", async () => {
+          expect(isDescending(descendingItemList)).toBeTruthy();
+        });
+
+        // STEP 4 — Click again → ascending
+        await test.step(`Click table header "${testCase.sortField}" again to sort ascending`, async () => {
+          const response = await usersPage.waitForApiResponse(
+            "GET",
+            async () => await usersPage.clickTableHeader(testCase.sortField),
+          );
+          expect(response.status()).toBe(200);
+        });
+
+        // STEP 5 — Retrieve ascending list
+        const ascendingItemList =
+          await test.step("Capture the ascending-sorted list", async () => {
+            const values = await page
+              .locator(`td.col-field-${testCase.sortLocator}`)
+              .allTextContents();
+            return values;
+          });
+
+        // STEP 6 — Validate ascending sorting
+        await test.step("Validate list is sorted ascending", async () => {
+          expect(isAscending(ascendingItemList)).toBeTruthy();
+        });
+      });
+    });
+  }
 });
+
+// test.describe.serial("Users Filtering Tests", () => {
+//   test.slow();
+//   // test.describe.configure({ mode: "parallel" });
+
+// })

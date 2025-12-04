@@ -8,6 +8,8 @@ import {
   WRONG_CREDENTIALS,
 } from "@tests/constants";
 
+test.describe.configure({ mode: "parallel" });
+
 test.describe("Authentication Tests", () => {
   test.slow();
 
