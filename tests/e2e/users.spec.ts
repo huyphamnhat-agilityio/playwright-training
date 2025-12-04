@@ -59,7 +59,7 @@ test.describe("User Management Tests", () => {
         }
       });
 
-      test(`TC_USER_001 - User can create a user with valid value - ${testCase.caseId} @TC_USER_001`, async ({
+      test(`TC_USER_001 - User can create a user with valid value - ${testCase.caseId} @TC_USER_001 @user @create`, async ({
         usersPage,
       }) => {
         test.slow();
@@ -133,7 +133,7 @@ test.describe("User Management Tests", () => {
   // Parameterized test for user form validation with invalid values
   for (const testCase of USER_INVALID_FORM_TEST_DATA) {
     test.describe(`${testCase.caseId}`, () => {
-      test(`TC_USER_002 - User cannot submit create user form with invalid value - ${testCase.caseId} @TC_USER_002`, async ({
+      test(`TC_USER_002 - User cannot submit create user form with invalid value - ${testCase.caseId} @TC_USER_002 @user @create`, async ({
         usersPage,
       }) => {
         test.info().annotations.push({
@@ -182,7 +182,7 @@ test.describe("User Management Tests", () => {
   // Parameterized test for user creation with wrong values
   for (const testCase of USER_WRONG_VALUE_TEST_DATA) {
     test.describe(`${testCase.caseId}`, () => {
-      test(`TC_USER_003 - User cannot create user with wrong value - ${testCase.caseId} @TC_USER_003`, async ({
+      test(`TC_USER_003 - User cannot create user with wrong value - ${testCase.caseId} @TC_USER_003 @user @create`, async ({
         page,
         usersPage,
       }) => {
@@ -317,7 +317,7 @@ test.describe("User Management Tests", () => {
         }
       });
 
-      test(`TC_USER_004 - User can edit user - @TC_USER_004`, async ({
+      test(`TC_USER_004 - User can edit user - @TC_USER_004 @user @edit`, async ({
         page,
         usersPage,
       }) => {
@@ -467,7 +467,7 @@ test.describe("User Management Tests", () => {
         }
       });
 
-      test(`TC_USER_005 - User cannot submit edit user form with invalid value - ${testCase.caseId} @TC_USER_005`, async ({
+      test(`TC_USER_005 - User cannot submit edit user form with invalid value - ${testCase.caseId} @TC_USER_005 @user @edit`, async ({
         usersPage,
       }) => {
         test.info().annotations.push({
@@ -577,7 +577,7 @@ test.describe("User Management Tests", () => {
         }
       });
 
-      test(`TC_USER_006 - User cannot submit edit user form with wrong value - ${testCase.caseId} @TC_USER_006`, async ({
+      test(`TC_USER_006 - User cannot submit edit user form with wrong value - ${testCase.caseId} @TC_USER_006 @user @edit`, async ({
         page,
         usersPage,
         browserName,
@@ -684,7 +684,7 @@ test.describe("User Management Tests", () => {
         });
       });
 
-      test(`TC_USER_007 - User delete users @TC_USER_007 @users @delete`, async ({
+      test(`TC_USER_007 - User delete users @TC_USER_007 @user @delete`, async ({
         usersPage,
       }) => {
         test.info().annotations.push({
@@ -730,22 +730,6 @@ test.describe("User Management Tests", () => {
       let testUsers: User[] = [];
 
       test.beforeEach(async ({ usersPage }) => {
-        // const headerCheckbox = usersPage.headerCheckbox;
-        // if (!(await headerCheckbox.isDisabled())) {
-        //   await test.step("Setup: Delete all users from previous test", async () => {
-        //     await headerCheckbox.click();
-        //     await usersPage.deleteButton.click();
-        //     // Listen for DELETE API response
-        //     const deleteResponse = await usersPage.waitForApiResponse(
-        //       "DELETE",
-        //       async () => await usersPage.confirmDeleteButton.click(),
-        //     );
-
-        //     // Verify DELETE API response
-        //     expect(await deleteResponse.finished()).toBeNull();
-        //   });
-        // }
-
         await test.step("Setup: Create test users via UI", async () => {
           for (const userData of testCase.testUsers) {
             const user = await usersPage.createUserViaUI(
@@ -782,7 +766,7 @@ test.describe("User Management Tests", () => {
         });
       });
 
-      test(`TC_USER_008 - User can sort users by ${testCase.sortField} @TC_USER_008`, async ({
+      test(`TC_USER_008 - User can sort users by ${testCase.sortField} @TC_USER_008 @user @sort`, async ({
         page,
         usersPage,
       }) => {
@@ -842,9 +826,3 @@ test.describe("User Management Tests", () => {
     });
   }
 });
-
-// test.describe.serial("Users Filtering Tests", () => {
-//   test.slow();
-//   // test.describe.configure({ mode: "parallel" });
-
-// })

@@ -13,7 +13,7 @@ test.describe.configure({ mode: "parallel" });
 test.describe("Authentication Tests", () => {
   test.slow();
 
-  test("TC_AUTH_001 - User can login with right username and password @TC_AUTH_001", async ({
+  test("TC_AUTH_001 - User can login with right username and password @TC_AUTH_001 @auth @login", async ({
     page,
     loginPage,
   }) => {
@@ -51,7 +51,7 @@ test.describe("Authentication Tests", () => {
 
   // Parameterized test for invalid credentials (form validation)
   for (const testCase of INVALID_CREDENTIALS) {
-    test(`TC_AUTH_002 - User cannot submit login form with invalid credentials - ${testCase.caseId} @TC_AUTH_002   `, async ({
+    test(`TC_AUTH_002 - User cannot submit login form with invalid credentials - ${testCase.caseId} @TC_AUTH_002 @auth @login`, async ({
       loginPage,
     }) => {
       test.info().annotations.push({
@@ -87,7 +87,7 @@ test.describe("Authentication Tests", () => {
 
   // Parameterized test for wrong credentials (authentication failure)
   for (const testCase of WRONG_CREDENTIALS) {
-    test(`TC_AUTH_003 - User cannot login with wrong credentials - ${testCase.caseId} @TC_AUTH_003   `, async ({
+    test(`TC_AUTH_003 - User cannot login with wrong credentials - ${testCase.caseId} @TC_AUTH_003 @auth @login`, async ({
       loginPage,
     }) => {
       test.slow();
@@ -125,7 +125,7 @@ test.describe("Authentication Tests", () => {
     });
   }
 
-  test("TC_AUTH_004 - User can logout @TC_AUTH_004", async ({
+  test("TC_AUTH_004 - User can logout @TC_AUTH_004 @auth @logout", async ({
     page,
     loginPage,
     dashboardPage,
