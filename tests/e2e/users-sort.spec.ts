@@ -19,7 +19,7 @@ test.describe("User Sort Tests", () => {
         await test.step(`Click table header "${options.field}" to sort descending`, async () => {
           const response = await sortUsersPage.waitForApiResponse(
             "GET",
-            async () => await sortUsersPage.clickTableHeader(options.field),
+            async () => await sortUsersPage.table.clickHeader(options.field),
           );
 
           expect(response.status()).toBe(200);
@@ -28,9 +28,7 @@ test.describe("User Sort Tests", () => {
         // STEP 2 — Retrieve descending list
         const descendingItemList =
           await test.step("Capture the descending-sorted list", async () => {
-            const values = await sortUsersPage.page
-              .locator(`td.col-field-${options.locator}`)
-              .allTextContents();
+            const values = sortUsersPage.table.getColumnValues(options.locator);
             return values;
           });
 
@@ -43,7 +41,7 @@ test.describe("User Sort Tests", () => {
         await test.step(`Click table header "${options.field}" again to sort ascending`, async () => {
           const response = await sortUsersPage.waitForApiResponse(
             "GET",
-            async () => await sortUsersPage.clickTableHeader(options.field),
+            async () => await sortUsersPage.table.clickHeader(options.field),
           );
           expect(response.status()).toBe(200);
         });
@@ -51,9 +49,9 @@ test.describe("User Sort Tests", () => {
         // STEP 5 — Retrieve ascending list
         const ascendingItemList =
           await test.step("Capture the ascending-sorted list", async () => {
-            const values = await sortUsersPage.page
-              .locator(`td.col-field-${options.locator}`)
-              .allTextContents();
+            const values = await sortUsersPage.table.getColumnValues(
+              options.locator,
+            );
             return values;
           });
 
