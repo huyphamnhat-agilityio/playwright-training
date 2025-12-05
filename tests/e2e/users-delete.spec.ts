@@ -21,7 +21,7 @@ test.describe("User Delete Tests", () => {
         await deleteUsersPage.deleteButton.click();
       });
 
-      await test.step('User clicks the "Yes" button in the confirm modal and verifies deletion', async () => {
+      await test.step('User clicks the "Yes" button in the confirm modal', async () => {
         // Listen for DELETE API response
         const deleteResponse = await deleteUsersPage.waitForApiResponse(
           "DELETE",
