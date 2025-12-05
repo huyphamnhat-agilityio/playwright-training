@@ -137,27 +137,6 @@ export class UsersPage extends BasePage {
     await header.click();
   }
 
-  async getUserEmailsFromList(): Promise<string[]> {
-    await this.page.waitForTimeout(500); // Wait for list to be stable
-    const userItems = this.page.locator(".list-item");
-    await userItems.first().waitFor({ state: "visible", timeout: 5000 });
-
-    const count = await userItems.count();
-    const emails: string[] = [];
-
-    for (let i = 0; i < count; i++) {
-      const userItem = userItems.nth(i);
-      const text = await userItem.textContent();
-      // Extract email from the user item text
-      const emailMatch = text?.match(/[\w.-]+@[\w.-]+\.\w+/);
-      if (emailMatch) {
-        emails.push(emailMatch[0]);
-      }
-    }
-
-    return emails;
-  }
-
   async getTableHeaderLocatorWithFilterStatus(
     name: string,
     filter: "asc" | "desc",

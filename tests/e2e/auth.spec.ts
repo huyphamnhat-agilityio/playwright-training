@@ -17,17 +17,9 @@ test.describe("Authentication Tests", () => {
     page,
     loginPage,
   }) => {
-    await test.step("User focuses the email field", async () => {
-      await loginPage.emailField.focus();
-    });
-
     await test.step("User fills the email field with valid email", async () => {
       await loginPage.emailField.fill(VALID_CREDENTIALS.email);
       await expect(loginPage.emailField).toHaveValue(VALID_CREDENTIALS.email);
-    });
-
-    await test.step("User focuses the password field", async () => {
-      await loginPage.passwordField.focus();
     });
 
     await test.step("User fills the password field with valid password", async () => {
@@ -59,16 +51,8 @@ test.describe("Authentication Tests", () => {
         description: testCase.description,
       });
 
-      await test.step("User focuses the email field", async () => {
-        await loginPage.emailField.focus();
-      });
-
       await test.step(`User fills the email field with: "${testCase.email || "(empty)"}"`, async () => {
         await loginPage.emailField.fill(testCase.email);
-      });
-
-      await test.step("User focuses the password field", async () => {
-        await loginPage.passwordField.focus();
       });
 
       await test.step(`User fills the password field with: "${testCase.password || "(empty)"}"`, async () => {
@@ -96,16 +80,8 @@ test.describe("Authentication Tests", () => {
         description: testCase.description,
       });
 
-      await test.step("User focuses the email field", async () => {
-        await loginPage.emailField.focus();
-      });
-
       await test.step(`User fills the email field with wrong email: "${testCase.email}"`, async () => {
         await loginPage.emailField.fill(testCase.email);
-      });
-
-      await test.step("User focuses the password field", async () => {
-        await loginPage.passwordField.focus();
       });
 
       await test.step(`User fills the password field with wrong password: "${testCase.password}"`, async () => {

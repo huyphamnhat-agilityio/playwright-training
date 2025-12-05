@@ -4,8 +4,9 @@ import {
   USER_EDIT_INVALID_TEST_DATA,
   USER_EDIT_WRONG_VALUE_TEST_DATA,
 } from "@tests/constants/user-test-data";
-import { ApiErrorResponse, User } from "@tests/types";
+import { ApiErrorResponse, User, UserCreatePayload } from "@tests/types";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "@tests/constants";
+import { createUser, deleteUser } from "@tests/services";
 
 test.describe("User Edit Tests", () => {
   test.slow();
@@ -17,47 +18,30 @@ test.describe("User Edit Tests", () => {
 
       // Setup: Create a user before the test
       test.beforeEach(async ({ usersPage, browserName }) => {
-        await test.step("Setup: Create test user via UI", async () => {
-          const email = `${testCase.originalEmail}${browserName}`;
-          testUser = await usersPage.createUserViaUI(
-            email,
-            testCase.originalPassword,
-          );
-          expect(testUser.id).toBeDefined();
-          expect(testUser.email).toBe(email);
+        await test.step("Setup: Create test user", async () => {
+          const payload: UserCreatePayload = {
+            email: `${testCase.originalEmail}${browserName}`,
+            password: testCase.originalPassword,
+            passwordConfirm: testCase.originalPassword,
+          };
+
+          // Create User via request Playwright API
+          testUser = await createUser(payload);
+
+          // Verify UI that user has been created
+          await usersPage.navigateTo();
+
+          await expect(
+            await usersPage.getUserByEmail(testUser.email),
+          ).toBeVisible();
         });
       });
 
       // Cleanup: Delete the user after the test
-      test.afterEach(async ({ usersPage }) => {
+      test.afterEach(async () => {
         if (testUser && testUser.id) {
-          await test.step("Cleanup: Delete test user via UI", async () => {
-            try {
-              const deleteCheckbox = usersPage.getUserDeleteCheckbox(
-                testUser.id,
-              );
-              await deleteCheckbox.waitFor({ state: "visible", timeout: 5000 });
-              await deleteCheckbox.click();
-
-              await usersPage.deleteButton.click();
-
-              const deleteResponse = await usersPage.waitForApiResponse(
-                "DELETE",
-                async () => await usersPage.confirmDeleteButton.click(),
-              );
-
-              expect(deleteResponse.status()).toBe(204);
-
-              const userElement = await usersPage.getUserByEmail(
-                testUser.email,
-              );
-              await expect(userElement).not.toBeVisible({ timeout: 5000 });
-            } catch (error) {
-              console.warn(
-                `Failed to delete test user ${testUser.email}:`,
-                error,
-              );
-            }
+          await test.step("Cleanup: Delete test user data", async () => {
+            await deleteUser(testUser.id);
           });
         }
       });
@@ -151,46 +135,32 @@ test.describe("User Edit Tests", () => {
     test.describe(`Edit Form Validation - ${testCase.caseId}`, () => {
       let testUser: User;
 
-      test.beforeEach(async ({ usersPage }) => {
+      // Setup: Create a user before the test
+      test.beforeEach(async ({ usersPage, browserName }) => {
         await test.step("Setup: Create test user via UI", async () => {
-          testUser = await usersPage.createUserViaUI(
-            testCase.originalEmail,
-            testCase.originalPassword,
-          );
-          expect(testUser.id).toBeDefined();
-          expect(testUser.email).toBe(testCase.originalEmail);
+          const payload: UserCreatePayload = {
+            email: `${testCase.originalEmail}${browserName}`,
+            password: testCase.originalPassword,
+            passwordConfirm: testCase.originalPassword,
+          };
+
+          // Create User via request Playwright API
+          testUser = await createUser(payload);
+
+          // Verify UI that user has been created
+          await usersPage.navigateTo();
+
+          await expect(
+            await usersPage.getUserByEmail(testUser.email),
+          ).toBeVisible();
         });
       });
 
-      test.afterEach(async ({ usersPage }) => {
+      // Cleanup: Delete the user after the test
+      test.afterEach(async () => {
         if (testUser && testUser.id) {
-          await test.step("Cleanup: Delete test user via UI", async () => {
-            try {
-              await usersPage.navigateTo();
-
-              const deleteCheckbox = usersPage.getUserDeleteCheckbox(
-                testUser.id,
-              );
-              await deleteCheckbox.waitFor({ state: "visible", timeout: 5000 });
-              await deleteCheckbox.click();
-
-              await usersPage.deleteButton.click();
-
-              await usersPage.waitForApiResponse(
-                "DELETE",
-                async () => await usersPage.confirmDeleteButton.click(),
-              );
-
-              const userElement = await usersPage.getUserByEmail(
-                testUser.email,
-              );
-              await expect(userElement).not.toBeVisible({ timeout: 5000 });
-            } catch (error) {
-              console.warn(
-                `Failed to delete test user ${testUser.email}:`,
-                error,
-              );
-            }
+          await test.step("Cleanup: Delete test user data", async () => {
+            await deleteUser(testUser.id);
           });
         }
       });
@@ -252,47 +222,32 @@ test.describe("User Edit Tests", () => {
     test.describe(`Edit Wrong Values - ${testCase.caseId}`, () => {
       let testUser: User;
 
+      // Setup: Create a user before the test
       test.beforeEach(async ({ usersPage, browserName }) => {
-        await test.step("Setup: Create test user via UI", async () => {
-          const email = `${testCase.originalEmail}${browserName}`;
-          testUser = await usersPage.createUserViaUI(
-            email,
-            testCase.originalPassword,
-          );
-          expect(testUser.id).toBeDefined();
-          expect(testUser.email).toBe(email);
+        await test.step("Setup: Create test user", async () => {
+          const payload: UserCreatePayload = {
+            email: `${testCase.originalEmail}${browserName}`,
+            password: testCase.originalPassword,
+            passwordConfirm: testCase.originalPassword,
+          };
+
+          // Create User via request Playwright API
+          testUser = await createUser(payload);
+
+          // Verify UI that user has been created
+          await usersPage.navigateTo();
+
+          await expect(
+            await usersPage.getUserByEmail(testUser.email),
+          ).toBeVisible();
         });
       });
 
-      test.afterEach(async ({ usersPage }) => {
+      // Cleanup: Delete the user after the test
+      test.afterEach(async () => {
         if (testUser && testUser.id) {
-          await test.step("Cleanup: Delete test user via UI", async () => {
-            try {
-              await usersPage.navigateTo();
-
-              const deleteCheckbox = usersPage.getUserDeleteCheckbox(
-                testUser.id,
-              );
-              await deleteCheckbox.waitFor({ state: "visible", timeout: 5000 });
-              await deleteCheckbox.click();
-
-              await usersPage.deleteButton.click();
-
-              await usersPage.waitForApiResponse(
-                "DELETE",
-                async () => await usersPage.confirmDeleteButton.click(),
-              );
-
-              const userElement = await usersPage.getUserByEmail(
-                testUser.email,
-              );
-              await expect(userElement).not.toBeVisible({ timeout: 5000 });
-            } catch (error) {
-              console.warn(
-                `Failed to delete test user ${testUser.email}:`,
-                error,
-              );
-            }
+          await test.step("Cleanup: Delete test user data", async () => {
+            await deleteUser(testUser.id);
           });
         }
       });
@@ -314,7 +269,6 @@ test.describe("User Edit Tests", () => {
         });
 
         await test.step(`User focuses the email field and fills the value: "${testCase.newEmail}"`, async () => {
-          await usersPage.emailField.focus();
           await usersPage.emailField.fill(`${testCase.newEmail}${browserName}`);
           await expect(usersPage.emailField).toHaveValue(
             `${testCase.newEmail}${browserName}`,
@@ -326,7 +280,6 @@ test.describe("User Edit Tests", () => {
         });
 
         await test.step(`User focuses the password field and fills the value: "${testCase.newPassword}"`, async () => {
-          await usersPage.passwordField.focus();
           await usersPage.passwordField.fill(testCase.newPassword);
           await expect(usersPage.passwordField).toHaveValue(
             testCase.newPassword,
@@ -334,7 +287,6 @@ test.describe("User Edit Tests", () => {
         });
 
         await test.step(`User focuses the password confirm field and fills the value: "${testCase.newPasswordConfirm}"`, async () => {
-          await usersPage.passwordConfirmField.focus();
           await usersPage.passwordConfirmField.fill(
             testCase.newPasswordConfirm,
           );
