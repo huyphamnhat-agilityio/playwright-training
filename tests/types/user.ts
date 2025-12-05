@@ -12,3 +12,9 @@ export type User = {
   verified: boolean;
   website: string;
 };
+
+export type UserCreatePayload = {
+  email: string;
+  password: string;
+  passwordConfirm: string;
+};

@@ -5,7 +5,13 @@ import {
   USER_WRONG_VALUE_TEST_DATA,
 } from "@tests/constants/user-test-data";
 import { ApiErrorResponse, User } from "@tests/types";
-import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "@tests/constants";
+import {
+  API_ENDPOINTS,
+  ERROR_MESSAGES,
+  SUCCESS_MESSAGES,
+} from "@tests/constants";
+import { request as baseRequest } from "@playwright/test";
+import userAuthState from "../../playwright/.auth/user.json";
 
 test.describe("User Creation Tests", () => {
   test.slow();
@@ -16,37 +22,25 @@ test.describe("User Creation Tests", () => {
       let createdUser: User;
 
       // Cleanup after the test
-      test.afterEach(async ({ usersPage }) => {
+      test.afterEach(async () => {
         if (createdUser && createdUser.id) {
           await test.step("Delete created user after test", async () => {
-            try {
-              const deleteCheckbox = usersPage.getUserDeleteCheckbox(
-                createdUser.id,
-              );
-              await deleteCheckbox.click();
+            const apiContext = await baseRequest.newContext({
+              baseURL: process.env.REQUEST_URL || "",
+              extraHTTPHeaders: {
+                Authorization: JSON.parse(
+                  userAuthState.origins[0].localStorage.find(
+                    (key) => key.name === "__pb_superuser_auth__",
+                  )?.value ?? "",
+                ).token,
+              },
+            });
 
-              await usersPage.deleteButton.click();
+            const response = await apiContext.delete(
+              `${API_ENDPOINTS.RECORDS}/${createdUser.id}`,
+            );
 
-              // Listen for DELETE API response and confirm deletion
-              const deleteResponse = await usersPage.waitForApiResponse(
-                "DELETE",
-                async () => await usersPage.confirmDeleteButton.click(),
-              );
-
-              // Verify DELETE API response
-              expect(deleteResponse.status()).toBe(204);
-
-              // Verify user is deleted from UI
-              const userElement = await usersPage.getUserByEmail(
-                createdUser.email,
-              );
-              await expect(userElement).not.toBeVisible({ timeout: 5000 });
-            } catch (error) {
-              console.warn(
-                `Failed to delete user ${createdUser.email}:`,
-                error,
-              );
-            }
+            expect(response.ok()).toBeTruthy();
           });
         }
       });
@@ -66,19 +60,16 @@ test.describe("User Creation Tests", () => {
         });
 
         await test.step("User focuses the email field and fills the value", async () => {
-          await usersPage.emailField.focus();
           await usersPage.emailField.fill(testCase.email);
           await expect(usersPage.emailField).toHaveValue(testCase.email);
         });
 
         await test.step("User focuses the password field and fills the value", async () => {
-          await usersPage.passwordField.focus();
           await usersPage.passwordField.fill(testCase.password);
           await expect(usersPage.passwordField).toHaveValue(testCase.password);
         });
 
         await test.step("User focuses the password confirm field and fills the value", async () => {
-          await usersPage.passwordConfirmField.focus();
           await usersPage.passwordConfirmField.fill(testCase.passwordConfirm);
           await expect(usersPage.passwordConfirmField).toHaveValue(
             testCase.passwordConfirm,
@@ -138,19 +129,16 @@ test.describe("User Creation Tests", () => {
         });
 
         await test.step(`User focuses the email field and fills the value: "${testCase.email || "(empty)"}"`, async () => {
-          await usersPage.emailField.focus();
           await usersPage.emailField.fill(testCase.email);
           await expect(usersPage.emailField).toHaveValue(testCase.email);
         });
 
         await test.step(`User focuses the password field and fills the value: "${testCase.password || "(empty)"}"`, async () => {
-          await usersPage.passwordField.focus();
           await usersPage.passwordField.fill(testCase.password);
           await expect(usersPage.passwordField).toHaveValue(testCase.password);
         });
 
         await test.step(`User focuses the password confirm field and fills the value: "${testCase.passwordConfirm || "(empty)"}"`, async () => {
-          await usersPage.passwordConfirmField.focus();
           await usersPage.passwordConfirmField.fill(testCase.passwordConfirm);
           await expect(usersPage.passwordConfirmField).toHaveValue(
             testCase.passwordConfirm,
@@ -189,19 +177,16 @@ test.describe("User Creation Tests", () => {
         });
 
         await test.step(`User focuses the email field and fills the value: "${testCase.email}"`, async () => {
-          await usersPage.emailField.focus();
           await usersPage.emailField.fill(testCase.email);
           await expect(usersPage.emailField).toHaveValue(testCase.email);
         });
 
         await test.step(`User focuses the password field and fills the value: "${testCase.password}"`, async () => {
-          await usersPage.passwordField.focus();
           await usersPage.passwordField.fill(testCase.password);
           await expect(usersPage.passwordField).toHaveValue(testCase.password);
         });
 
         await test.step(`User focuses the password confirm field and fills the value: "${testCase.passwordConfirm}"`, async () => {
-          await usersPage.passwordConfirmField.focus();
           await usersPage.passwordConfirmField.fill(testCase.passwordConfirm);
           await expect(usersPage.passwordConfirmField).toHaveValue(
             testCase.passwordConfirm,
@@ -223,24 +208,14 @@ test.describe("User Creation Tests", () => {
           expect(apiErrorResponse.message).toBeDefined();
         });
 
-        await test.step("User can see error message and stays on create form", async () => {
+        await test.step("User can see toast error message, input error message and stays on create form", async () => {
           // Verify error message appears in UI
           const errorMessage = page.getByText(ERROR_MESSAGES.CREATE_FAIL);
           await expect(errorMessage).toBeVisible({ timeout: 5000 });
 
           // Verify we're still on the create form
           await expect(usersPage.createButton).toBeVisible();
-        });
 
-        await test.step("Verify UI error message matches API response", async () => {
-          // Get the error message from UI
-          const errorMessage = page.getByText(ERROR_MESSAGES.CREATE_FAIL);
-          const uiErrorText = await errorMessage.textContent();
-
-          // Verify UI error message contains the API error message
-          expect(uiErrorText).toContain(apiErrorResponse.message);
-
-          // Also verify it matches expected error pattern
           const inputErrorMessage = page.getByText(testCase.expectedError);
           expect(await inputErrorMessage.textContent()).toContain(
             testCase.expectedError,

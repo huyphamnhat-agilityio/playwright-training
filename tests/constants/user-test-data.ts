@@ -69,6 +69,7 @@ export const USER_WRONG_VALUE_TEST_DATA = [
     expectedError: "Values don't match.",
   },
 ];
+
 export const USER_EDIT_TEST_DATA = [
   {
     caseId: "Case 1",
@@ -113,23 +114,6 @@ export const USER_EDIT_INVALID_TEST_DATA = [
   },
 ];
 
-export const USER_DELETE_TEST_DATA = [
-  {
-    caseId: "Case 1",
-    description: "Delete multiple users",
-    users: [
-      {
-        email: "testdelete1@example.com",
-        password: "123456789",
-      },
-      {
-        email: "testdelete2@example.com",
-        password: "123456789",
-      },
-    ],
-  },
-];
-
 export const USER_EDIT_WRONG_VALUE_TEST_DATA = [
   {
     caseId: "Case 1",
@@ -155,39 +139,58 @@ export const USER_EDIT_WRONG_VALUE_TEST_DATA = [
   },
 ];
 
-export const USER_SORT_TEST_DATA = [
+export const USER_DELETE_TEST_DATA = [
   {
-    caseId: "Case 1",
-    description: "Sort users by email",
-    sortField: " email ",
-    sortLocator: "email",
-    testUsers: [
-      { email: "charlie@example.com", password: "testpass123" },
-      { email: "alice@example.com", password: "testpass123" },
-      { email: "bob@example.com", password: "testpass123" },
-    ],
+    email: "testdelete1@example.com",
+    password: "123456789",
   },
   {
-    caseId: "Case 2",
-    description: "Sort users by username",
-    sortField: " username ",
-    sortLocator: "username",
-
-    testUsers: [
-      { email: "usersort3@example.com", password: "testpass123" },
-      { email: "usersort1@example.com", password: "testpass123" },
-      { email: "usersort2@example.com", password: "testpass123" },
-    ],
-  },
-  {
-    caseId: "Case 3",
-    description: "Sort users by created date",
-    sortField: " created ",
-    sortLocator: "created",
-    testUsers: [
-      { email: "newest@example.com", password: "testpass123" },
-      { email: "oldest@example.com", password: "testpass123" },
-      { email: "middle@example.com", password: "testpass123" },
-    ],
+    email: "testdelete2@example.com",
+    password: "123456789",
   },
 ];
+
+export const USER_SORT_TEST_DATA = {
+  testUsers: [
+    { email: "charlie@example.com", password: "testpass123" },
+    { email: "alice@example.com", password: "testpass123" },
+    { email: "bob@example.com", password: "testpass123" },
+  ],
+  sortOptions: [
+    { field: " email ", locator: "email" },
+    { field: " username ", locator: "username" },
+    { field: " created ", locator: "created" },
+  ],
+};
+// export const USER_SORT_TEST_DATA = [
+//   {
+//     caseId: "Case 1",
+//     description: "Sort users by email",
+//     sortField: ,
+//     sortLocator: "",
+//     testUsers: ,
+//   },
+//   {
+//     caseId: "Case 2",
+//     description: "Sort users by username",
+//     sortField: ",
+//     sortLocator: "username",
+
+//     testUsers: [
+//       { email: "usersort3@example.com", password: "testpass123" },
+//       { email: "usersort1@example.com", password: "testpass123" },
+//       { email: "usersort2@example.com", password: "testpass123" },
+//     ],
+//   },
+//   {
+//     caseId: "Case 3",
+//     description: "Sort users by created date",
+//     sortField: "",
+//     sortLocator: "created",
+//     testUsers: [
+//       { email: "newest@example.com", password: "testpass123" },
+//       { email: "oldest@example.com", password: "testpass123" },
+//       { email: "middle@example.com", password: "testpass123" },
+//     ],
+//   },
+// ];
