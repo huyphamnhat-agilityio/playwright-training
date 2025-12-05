@@ -5,18 +5,17 @@ import { isAscending, isDescending } from "@tests/utils/validation";
 test.describe("User Sort Tests", () => {
   test.slow();
 
-  // TC_USER_008: User can sort users
-  test.describe(`Sort Users`, () => {
-    test.slow();
-
-    for (const options of USER_SORT_TEST_DATA.sortOptions) {
-      test(`TC_USER_008 - User can sort users by ${options.field}`, async ({
-        sortUsersPage,
-      }) => {
+  for (const options of USER_SORT_TEST_DATA.sortOptions) {
+    test(
+      `TC_USER_008 - Verify sorting users by "${options.field}"`,
+      {
+        tag: ["@TC_USER_008", "@user", "@sort"],
+      },
+      async ({ sortUsersPage }) => {
         await sortUsersPage.waitForPageLoad();
 
-        // STEP 1 — Click once → descending
-        await test.step(`Click table header "${options.field}" to sort descending`, async () => {
+        // STEP 1 — Trigger DESC sorting
+        await test.step(`Click the "${options.field}" column header to sort in descending order`, async () => {
           const response = await sortUsersPage.waitForApiResponse(
             "GET",
             async () => await sortUsersPage.table.clickHeader(options.field),
@@ -25,41 +24,36 @@ test.describe("User Sort Tests", () => {
           expect(response.status()).toBe(200);
         });
 
-        // STEP 2 — Retrieve descending list
+        // STEP 2 — Capture DESC results
         const descendingItemList =
-          await test.step("Capture the descending-sorted list", async () => {
-            const values = sortUsersPage.table.getColumnValues(options.locator);
-            return values;
-          });
+          await test.step(`Retrieve the values sorted in descending order for "${options.field}"`, async () =>
+            await sortUsersPage.table.getColumnValues(options.locator));
 
-        // STEP 3 — Validate descending sorting
-        await test.step("Validate list is sorted descending", async () => {
+        // STEP 3 — Validate DESC sorting
+        await test.step(`Verify that the values are correctly sorted in descending order`, async () => {
           expect(isDescending(descendingItemList)).toBeTruthy();
         });
 
-        // STEP 4 — Click again → ascending
-        await test.step(`Click table header "${options.field}" again to sort ascending`, async () => {
+        // STEP 4 — Trigger ASC sorting
+        await test.step(`Click the "${options.field}" column header again to sort in ascending order`, async () => {
           const response = await sortUsersPage.waitForApiResponse(
             "GET",
             async () => await sortUsersPage.table.clickHeader(options.field),
           );
+
           expect(response.status()).toBe(200);
         });
 
-        // STEP 5 — Retrieve ascending list
+        // STEP 5 — Capture ASC results
         const ascendingItemList =
-          await test.step("Capture the ascending-sorted list", async () => {
-            const values = await sortUsersPage.table.getColumnValues(
-              options.locator,
-            );
-            return values;
-          });
+          await test.step(`Retrieve the values sorted in ascending order for "${options.field}"`, async () =>
+            await sortUsersPage.table.getColumnValues(options.locator));
 
-        // STEP 6 — Validate ascending sorting
-        await test.step("Validate list is sorted ascending", async () => {
+        // STEP 6 — Validate ASC sorting
+        await test.step(`Verify that the values are correctly sorted in ascending order`, async () => {
           expect(isAscending(ascendingItemList)).toBeTruthy();
         });
-      });
-    }
-  });
+      },
+    );
+  }
 });
