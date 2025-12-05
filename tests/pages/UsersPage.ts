@@ -2,6 +2,7 @@ import { Page, Locator } from "@playwright/test";
 import { API_ENDPOINTS } from "@tests/constants";
 import { BasePage } from "@tests/pages/BasePage";
 import { User } from "@tests/types";
+import { Table } from "@tests/utils";
 
 export class UsersPage extends BasePage {
   readonly newRecordButton: Locator;
@@ -14,6 +15,7 @@ export class UsersPage extends BasePage {
   readonly deleteButton: Locator;
   readonly confirmDeleteButton: Locator;
   readonly cancelButton: Locator;
+  readonly table: Table;
 
   constructor(page: Page) {
     super(page);
@@ -31,6 +33,7 @@ export class UsersPage extends BasePage {
     this.deleteButton = page.getByRole("button", { name: "Delete selected" });
     this.confirmDeleteButton = page.getByRole("button", { name: "Yes" });
     this.cancelButton = page.getByRole("button", { name: "Cancel" });
+    this.table = new Table(page, "table");
   }
 
   async navigateTo() {
