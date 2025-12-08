@@ -2,11 +2,11 @@ import { test, expect } from "@tests/fixtures/users.fixture";
 
 test.describe("User Delete Tests", () => {
   test.slow();
-  // TC_USER_007: User can delete users
+  // TC_USERS_007: User can delete users
   test(
-    `TC_USER_007 - User can delete other users`,
+    `TC_USERS_007 - User can delete other users`,
     {
-      tag: ["@TC_USER_007", "@user", "@delete"],
+      tag: ["@TC_USERS_007", "@user", "@delete"],
     },
     async ({ deleteUsersPage }) => {
       await test.step("User clicks the checkbox of users", async () => {

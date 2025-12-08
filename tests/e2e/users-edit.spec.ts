@@ -11,7 +11,7 @@ import { createUser, deleteUser } from "@tests/services";
 test.describe("User Edit Tests", () => {
   test.slow();
 
-  // TC_USER_004: User can edit user
+  // TC_USERS_004: User can edit user
   for (const testCase of USER_EDIT_TEST_DATA) {
     test.describe(`${testCase.caseId}`, () => {
       let testUser: User;
@@ -47,9 +47,9 @@ test.describe("User Edit Tests", () => {
       });
 
       test(
-        `TC_USER_004 - User can edit user`,
+        `TC_USERS_004 - User can edit user`,
         {
-          tag: ["@TC_USER_004", "@user", "@edit"],
+          tag: ["@TC_USERS_004", "@user", "@edit"],
         },
         async ({ page, usersPage }) => {
           test.info().annotations.push({
@@ -139,7 +139,7 @@ test.describe("User Edit Tests", () => {
     });
   }
 
-  // TC_USER_005: User cannot submit edit user form with invalid value
+  // TC_USERS_005: User cannot submit edit user form with invalid value
   for (const testCase of USER_EDIT_INVALID_TEST_DATA) {
     test.describe(`Edit Form Validation - ${testCase.caseId}`, () => {
       let testUser: User;
@@ -175,9 +175,9 @@ test.describe("User Edit Tests", () => {
       });
 
       test(
-        `TC_USER_005 - User cannot submit edit user form with invalid value - ${testCase.caseId}`,
+        `TC_USERS_005 - User cannot submit edit user form with invalid value - ${testCase.caseId}`,
         {
-          tag: ["@TC_USER_005", "@user", "@edit"],
+          tag: ["@TC_USERS_005", "@user", "@edit"],
         },
         async ({ usersPage }) => {
           test.info().annotations.push({
@@ -230,7 +230,7 @@ test.describe("User Edit Tests", () => {
     });
   }
 
-  // TC_USER_006: User cannot submit edit user form with wrong value
+  // TC_USERS_006: User cannot submit edit user form with wrong value
   for (const testCase of USER_EDIT_WRONG_VALUE_TEST_DATA) {
     test.describe(`Edit Wrong Values - ${testCase.caseId}`, () => {
       let testUser: User;
@@ -266,9 +266,9 @@ test.describe("User Edit Tests", () => {
       });
 
       test(
-        `TC_USER_006 - User cannot submit edit user form with wrong value - ${testCase.caseId}`,
+        `TC_USERS_006 - User cannot submit edit user form with wrong value - ${testCase.caseId}`,
         {
-          tag: ["@TC_USER_006", "@user", "@edit"],
+          tag: ["@TC_USERS_006", "@user", "@edit"],
         },
         async ({ page, usersPage, browserName }) => {
           test.info().annotations.push({
