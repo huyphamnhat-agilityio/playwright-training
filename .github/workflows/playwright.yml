@@ -26,6 +26,15 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
 
+      # ----------------------------------------------------------
+      # Step: Generate authenticated state for CI
+      # ----------------------------------------------------------
+      - name: Generate auth state
+        run: pnpm exec playwright test tests/e2e/auth.setup.ts --config=playwright.config.ts
+
+      # ----------------------------------------------------------
+      # ▶ Step: Run tests normally after auth state exists
+      # ----------------------------------------------------------
       - name: Run Playwright tests and generate HTML report
         run: pnpm exec playwright test --reporter=html
 
