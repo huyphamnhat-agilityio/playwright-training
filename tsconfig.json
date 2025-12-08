@@ -12,7 +12,8 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@tests/*": ["tests/*"]
+      "@tests/*": ["tests/*"],
+      "@/*": ["./*"]
     }
   },
   "include": ["tests/**/*", "playwright.config.ts"],

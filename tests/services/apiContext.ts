@@ -1,5 +1,5 @@
 import { request as baseRequest } from "@playwright/test";
-import userAuthState from "../../playwright/.auth/user.json";
+import userAuthState from "@/playwright/.auth/user.json";
 
 export const createAuthenticatedRequest = async () =>
   await baseRequest.newContext({

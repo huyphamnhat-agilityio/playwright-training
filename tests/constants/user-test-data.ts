@@ -1,48 +1,30 @@
-export const USER_CREATION_TEST_DATA = [
-  {
-    caseId: "Case 1",
-    description: "Email: testuser@example.com, Password: testpassword",
-    email: "testuser@example.com",
-    password: "testpassword",
-    passwordConfirm: "testpassword",
-  },
-  {
-    caseId: "Case 2",
-    description: "Email: testuser2@example.com, Password: testpassword",
-    email: "testuser2@example.com",
-    password: "testpassword",
-    passwordConfirm: "testpassword",
-  },
-];
+export const USER_CREATION_TEST_DATA = {
+  email: "testuser@example.com",
+  password: "testpassword",
+  passwordConfirm: "testpassword",
+};
 
 export const USER_INVALID_FORM_TEST_DATA = [
   {
-    caseId: "Case 1",
-    description: "Email: (empty), Password: (empty), Password Confirm: (empty)",
+    description: "empty email, password and confirm password",
     email: "",
     password: "",
     passwordConfirm: "",
   },
   {
-    caseId: "Case 2",
-    description:
-      "Email: testuser@example.com, Password: (empty), Password Confirm: (empty)",
+    description: "empty password and confirm password",
     email: "testuser@example.com",
     password: "",
     passwordConfirm: "",
   },
   {
-    caseId: "Case 3",
-    description:
-      "Email: testuser@example.com, Password: test, Password Confirm: (empty)",
+    description: "empty confirm password",
     email: "testuser@example.com",
     password: "test",
     passwordConfirm: "",
   },
   {
-    caseId: "Case 4",
-    description:
-      "Email: testuser@example.com, Password: (empty), Password Confirm: test",
+    description: "empty password",
     email: "testuser@example.com",
     password: "",
     passwordConfirm: "test",
@@ -51,18 +33,14 @@ export const USER_INVALID_FORM_TEST_DATA = [
 
 export const USER_WRONG_VALUE_TEST_DATA = [
   {
-    caseId: "Case 1",
-    description:
-      "Email: wronguser@example.com, Password: 123456, Password Confirm: 123456",
+    description: "password less than 8 characters",
     email: "wronguser@example.com",
     password: "123456",
     passwordConfirm: "123456",
     expectedError: "Must be at least 8 character(s).",
   },
   {
-    caseId: "Case 2",
-    description:
-      "Email: erroruser1@example.com, Password: 12345678, Password Confirm: 123456789",
+    description: "password confirm mismatch with password",
     email: "erroruser1@example.com",
     password: "12345678",
     passwordConfirm: "123456789",
@@ -70,22 +48,17 @@ export const USER_WRONG_VALUE_TEST_DATA = [
   },
 ];
 
-export const USER_EDIT_TEST_DATA = [
-  {
-    caseId: "Case 1",
-    description: "Edit user email and password",
-    originalEmail: "testuseredit@example.com",
-    originalPassword: "123456789",
-    newEmail: "testuser1@example.com",
-    newPassword: "12345678",
-    newPasswordConfirm: "12345678",
-  },
-];
+export const USER_EDIT_TEST_DATA = {
+  originalEmail: "testuseredit@example.com",
+  originalPassword: "123456789",
+  newEmail: "testuser1@example.com",
+  newPassword: "12345678",
+  newPasswordConfirm: "12345678",
+};
 
 export const USER_EDIT_INVALID_TEST_DATA = [
   {
-    caseId: "Case 1",
-    description: "Email: (empty), Password: 12345678",
+    description: "empty email",
     originalEmail: "testuseredit1@example.com",
     originalPassword: "123456789",
     newEmail: "",
@@ -93,9 +66,7 @@ export const USER_EDIT_INVALID_TEST_DATA = [
     newPasswordConfirm: "12345678",
   },
   {
-    caseId: "Case 2",
-    description:
-      "Email: testuseredit2@example.com, Password: (empty), Password Confirm: 12345678",
+    description: "empty password",
     originalEmail: "testuseredit2@example.com",
     originalPassword: "123456789",
     newEmail: "testuseredit2@example.com",
@@ -103,9 +74,7 @@ export const USER_EDIT_INVALID_TEST_DATA = [
     newPasswordConfirm: "12345678",
   },
   {
-    caseId: "Case 3",
-    description:
-      "Email: testuseredit3@example.com, Password: 12345678, Password Confirm: (empty)",
+    description: "empty confirm password",
     originalEmail: "testuseredit3@example.com",
     originalPassword: "123456789",
     newEmail: "testuseredit3@example.com",
@@ -116,9 +85,7 @@ export const USER_EDIT_INVALID_TEST_DATA = [
 
 export const USER_EDIT_WRONG_VALUE_TEST_DATA = [
   {
-    caseId: "Case 1",
-    description:
-      "Email: testuseredit4@example.com, Password: 123456, Password Confirm: 123456",
+    description: "password less than 8 characters",
     originalEmail: "testuseredit4@example.com",
     originalPassword: "123456789",
     newEmail: "testuseredit4@example.com",
@@ -127,9 +94,7 @@ export const USER_EDIT_WRONG_VALUE_TEST_DATA = [
     expectedError: "Must be at least 8 character(s).",
   },
   {
-    caseId: "Case 2",
-    description:
-      "Email: testuseredit5@example.com, Password: 123456789, Password Confirm: 12345678",
+    description: "confirm password mismatch with password",
     originalEmail: "testuseredit5@example.com",
     originalPassword: "123456789",
     newEmail: "testuseredit5@example.com",

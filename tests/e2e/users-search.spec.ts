@@ -4,22 +4,26 @@ import { ApiResponse } from "@tests/types";
 
 test.describe("User Search Tests", () => {
   test.slow();
+
   test(
-    `TC_USERS_009 - Case 1 - User can search user by email`,
+    `TC_USERS_009 - User can search user by email`,
     {
       tag: ["@TC_USERS_009", "@user", "@search"],
     },
-    async ({ searchUsersPage }) => {
+    async ({ searchUsersPage, browserName }) => {
       const expectedUser = USER_SEARCH_TEST_DATA[0];
-      await searchUsersPage.waitForPageLoad();
+
+      await searchUsersPage.navigateTo();
 
       // User fill the search input with value
       await test.step(`User focus and fill the search input with value`, async () => {
-        await searchUsersPage.searchInput.fill(expectedUser.email);
+        await searchUsersPage.searchInput.fill(
+          `${expectedUser.email}${browserName}`,
+        );
       });
 
       // User click the search button
-      await test.step(`User click the search button and verify API response that match with UI result`, async () => {
+      await test.step(`The user clicks the search button and sees the user list showing items that match the keyword`, async () => {
         const response = await searchUsersPage.waitForApiResponse(
           "GET",
           async () => await searchUsersPage.searchButton.click(),
@@ -37,7 +41,9 @@ test.describe("User Search Tests", () => {
         const itemList = await searchUsersPage.table.getColumnValues("email");
 
         // Expect the user field has include in the UI
-        const isItemExist = itemList.includes(expectedUser.email);
+        const isItemExist = itemList.includes(
+          `${expectedUser.email}${browserName}`,
+        );
 
         expect(isItemExist).toBeTruthy();
       });
@@ -45,21 +51,24 @@ test.describe("User Search Tests", () => {
   );
 
   test(
-    `TC_USERS_009 - Case 2 - User can search user by username`,
+    `TC_USERS_009 - User can search user by username`,
     {
       tag: ["@TC_USERS_009", "@user", "@search"],
     },
-    async ({ searchUsersPage }) => {
+    async ({ searchUsersPage, browserName }) => {
       const expectedUser = USER_SEARCH_TEST_DATA[1];
-      await searchUsersPage.waitForPageLoad();
+
+      await searchUsersPage.navigateTo();
 
       // User fill the search input with value
       await test.step(`User focus and fill the search input with value`, async () => {
-        await searchUsersPage.searchInput.fill(expectedUser.username);
+        await searchUsersPage.searchInput.fill(
+          `${expectedUser.username}${browserName}`,
+        );
       });
 
       // User click the search button
-      await test.step(`User click the search button and verify API response that match with UI result`, async () => {
+      await test.step(`The user clicks the search button and sees the user list showing items that match the keyword`, async () => {
         const response = await searchUsersPage.waitForApiResponse(
           "GET",
           async () => await searchUsersPage.searchButton.click(),
@@ -78,7 +87,9 @@ test.describe("User Search Tests", () => {
           await searchUsersPage.table.getColumnValues("username");
 
         // Expect the user field has include in the UI
-        const isItemExist = itemList.includes(expectedUser.username);
+        const isItemExist = itemList.includes(
+          `${expectedUser.username}${browserName}`,
+        );
 
         expect(isItemExist).toBeTruthy();
       });
