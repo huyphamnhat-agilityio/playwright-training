@@ -25,7 +25,7 @@ export const test = base.extend<UsersFixtures>({
     await usersPage.navigateTo();
     await use(usersPage);
   },
-  deleteUsersPage: async ({ page }, use) => {
+  deleteUsersPage: async ({ page, browserName }, use) => {
     const usersPage = new UsersPage(page);
 
     const userList: { email: string; id: string }[] = [];
@@ -34,10 +34,11 @@ export const test = base.extend<UsersFixtures>({
     for (const payload of USER_DELETE_TEST_DATA) {
       const user = await createUser({
         ...payload,
+        email: `${payload.email}${browserName}`,
         passwordConfirm: payload.password,
       });
 
-      if (user) {
+      if (user.id) {
         userList.push({ email: user.email, id: user.id });
       }
     }
@@ -46,8 +47,19 @@ export const test = base.extend<UsersFixtures>({
 
     // Pass a combined object into the fixture
     await use(Object.assign(usersPage, { userList }));
+
+    // Cleanup any remaining users after test
+    for (const { id } of userList) {
+      try {
+        await deleteUser(id);
+      } catch (error) {
+        // User might already be deleted by the test
+        console.warn(`Failed to cleanup user ${id}:`, error);
+      }
+    }
   },
-  sortUsersPage: async ({ page }, use) => {
+
+  sortUsersPage: async ({ page, browserName }, use) => {
     const usersPage = new UsersPage(page);
 
     const userList: { email: string; id: string }[] = [];
@@ -56,6 +68,7 @@ export const test = base.extend<UsersFixtures>({
     for (const payload of USER_SORT_TEST_DATA.testUsers) {
       const user = await createUser({
         ...payload,
+        email: `${payload.email}${browserName}`,
         passwordConfirm: payload.password,
       });
 
@@ -79,7 +92,7 @@ export const test = base.extend<UsersFixtures>({
       await deleteUser(id);
     }
   },
-  searchUsersPage: async ({ page }, use) => {
+  searchUsersPage: async ({ page, browserName }, use) => {
     const usersPage = new UsersPage(page);
 
     const userList: { email: string; id: string }[] = [];
@@ -88,6 +101,8 @@ export const test = base.extend<UsersFixtures>({
     for (const payload of USER_SEARCH_TEST_DATA) {
       const user = await createUser({
         ...payload,
+        email: `${payload.email}${browserName}`,
+        username: `${payload.username}${browserName}`,
         passwordConfirm: payload.password,
       });
 

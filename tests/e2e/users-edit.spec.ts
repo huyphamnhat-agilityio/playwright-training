@@ -12,136 +12,129 @@ test.describe("User Edit Tests", () => {
   test.slow();
 
   // TC_USERS_004: User can edit user
-  for (const testCase of USER_EDIT_TEST_DATA) {
-    test.describe(`${testCase.caseId}`, () => {
-      let testUser: User;
+  test.describe(`TC_USERS_004 - User can edit user`, () => {
+    let testUser: User;
 
-      // Setup: Create a user before the test
-      test.beforeEach(async ({ usersPage, browserName }) => {
-        await test.step("Setup: Create test user", async () => {
-          const payload: UserCreatePayload = {
-            email: `${testCase.originalEmail}${browserName}`,
-            password: testCase.originalPassword,
-            passwordConfirm: testCase.originalPassword,
-          };
+    // Setup: Create a user before the test
+    test.beforeEach(async ({ usersPage, browserName }) => {
+      await test.step("Setup: Create test user", async () => {
+        const payload: UserCreatePayload = {
+          email: `${USER_EDIT_TEST_DATA.originalEmail}${browserName}`,
+          password: USER_EDIT_TEST_DATA.originalPassword,
+          passwordConfirm: USER_EDIT_TEST_DATA.originalPassword,
+        };
 
-          // Create User via request Playwright API
-          testUser = await createUser(payload);
+        // Create User via request Playwright API
+        testUser = await createUser(payload);
 
-          // Verify UI that user has been created
-          await usersPage.navigateTo();
+        // Verify UI that user has been created
+        await usersPage.navigateTo();
 
-          await expect(
-            await usersPage.getUserByEmail(testUser.email),
-          ).toBeVisible();
-        });
+        await expect(
+          await usersPage.getUserByEmail(testUser.email),
+        ).toBeVisible();
       });
-
-      // Cleanup: Delete the user after the test
-      test.afterEach(async () => {
-        if (testUser && testUser.id) {
-          await test.step("Cleanup: Delete test user data", async () => {
-            await deleteUser(testUser.id);
-          });
-        }
-      });
-
-      test(
-        `TC_USERS_004 - User can edit user`,
-        {
-          tag: ["@TC_USERS_004", "@user", "@edit"],
-        },
-        async ({ page, usersPage }) => {
-          test.info().annotations.push({
-            type: "description",
-            description: testCase.description,
-          });
-
-          let apiResponse: User;
-
-          await test.step(`User clicks the table data with title: "${testCase.originalEmail}"`, async () => {
-            await usersPage.editUserByEmail(testCase.originalEmail);
-          });
-
-          await test.step("Verify edit form is show to the screen", async () => {
-            const formHeading = page.getByRole("heading", {
-              name: "Edit users record",
-            });
-            await expect(formHeading).toBeVisible();
-          });
-
-          await test.step(`User focuses the email field and fills the value: "${testCase.newEmail}"`, async () => {
-            await usersPage.emailField.click();
-            await usersPage.emailField.fill(testCase.newEmail);
-            await expect(usersPage.emailField).toHaveValue(testCase.newEmail);
-          });
-
-          await test.step("User clicks the change password checkbox", async () => {
-            await usersPage.clickChangePasswordCheckbox();
-          });
-
-          await test.step(`User focuses the password field and fills the value: "${testCase.newPassword}"`, async () => {
-            await usersPage.passwordField.click();
-            await usersPage.passwordField.fill(testCase.newPassword);
-            await expect(usersPage.passwordField).toHaveValue(
-              testCase.newPassword,
-            );
-          });
-
-          await test.step(`User focuses the password confirm field and fills the value: "${testCase.newPasswordConfirm}"`, async () => {
-            await usersPage.passwordConfirmField.click();
-            await usersPage.passwordConfirmField.fill(
-              testCase.newPasswordConfirm,
-            );
-            await expect(usersPage.passwordConfirmField).toHaveValue(
-              testCase.newPasswordConfirm,
-            );
-          });
-
-          await test.step('User clicks the "Save changes" button and verifies API response', async () => {
-            const response = await usersPage.waitForApiResponse(
-              "PATCH",
-              async () => await usersPage.saveChangesButton.click(),
-            );
-
-            apiResponse = await response.json();
-
-            expect(response.status()).toBe(200);
-            expect(apiResponse.email).toBe(testCase.newEmail);
-            expect(apiResponse.id).toBe(testUser.id);
-          });
-
-          await test.step("User can see the new updated user information on the list beside the success toast message", async () => {
-            await usersPage.verifySuccessMessage(
-              SUCCESS_MESSAGES.UPDATE_SUCCESS,
-            );
-
-            const userInList = await usersPage.getUserByEmail(
-              testCase.newEmail,
-            );
-            await expect(userInList).toBeVisible();
-            await expect(userInList).toContainText(testCase.newEmail);
-          });
-
-          await test.step("Verify UI result matches API response", async () => {
-            expect(apiResponse.email).toBe(testCase.newEmail);
-            expect(apiResponse.id).toBe(testUser.id);
-
-            const userInList = await usersPage.getUserByEmail(
-              testCase.newEmail,
-            );
-            await expect(userInList).toContainText(apiResponse.email);
-
-            testUser = apiResponse;
-          });
-        },
-      );
     });
-  }
+
+    // Cleanup: Delete the user after the test
+    test.afterEach(async () => {
+      if (testUser && testUser.id) {
+        await test.step("Cleanup: Delete test user data", async () => {
+          await deleteUser(testUser.id);
+        });
+      }
+    });
+
+    test(
+      `TC_USERS_004 - User can edit user with valid value`,
+      {
+        tag: ["@TC_USERS_004", "@user", "@edit"],
+      },
+      async ({ page, usersPage }) => {
+        let apiResponse: User;
+
+        await test.step(`User clicks the table data with title: "${USER_EDIT_TEST_DATA.originalEmail}"`, async () => {
+          await usersPage.editUserByEmail(USER_EDIT_TEST_DATA.originalEmail);
+        });
+
+        await test.step("Verify edit form is show to the screen", async () => {
+          const formHeading = page.getByRole("heading", {
+            name: "Edit users record",
+          });
+          await expect(formHeading).toBeVisible();
+        });
+
+        await test.step(`User focuses the email field and fills the value: "${USER_EDIT_TEST_DATA.newEmail}"`, async () => {
+          await usersPage.emailField.click();
+          await usersPage.emailField.fill(USER_EDIT_TEST_DATA.newEmail);
+          await expect(usersPage.emailField).toHaveValue(
+            USER_EDIT_TEST_DATA.newEmail,
+          );
+        });
+
+        await test.step("User clicks the change password checkbox", async () => {
+          await usersPage.clickChangePasswordCheckbox();
+        });
+
+        await test.step(`User focuses the password field and fills the value: "${USER_EDIT_TEST_DATA.newPassword}"`, async () => {
+          await usersPage.passwordField.click();
+          await usersPage.passwordField.fill(USER_EDIT_TEST_DATA.newPassword);
+          await expect(usersPage.passwordField).toHaveValue(
+            USER_EDIT_TEST_DATA.newPassword,
+          );
+        });
+
+        await test.step(`User focuses the password confirm field and fills the value: "${USER_EDIT_TEST_DATA.newPasswordConfirm}"`, async () => {
+          await usersPage.passwordConfirmField.click();
+          await usersPage.passwordConfirmField.fill(
+            USER_EDIT_TEST_DATA.newPasswordConfirm,
+          );
+          await expect(usersPage.passwordConfirmField).toHaveValue(
+            USER_EDIT_TEST_DATA.newPasswordConfirm,
+          );
+        });
+
+        await test.step('User clicks the "Save changes" button and verifies API response', async () => {
+          const response = await usersPage.waitForApiResponse(
+            "PATCH",
+            async () => await usersPage.saveChangesButton.click(),
+          );
+
+          apiResponse = await response.json();
+
+          expect(response.status()).toBe(200);
+          expect(apiResponse.email).toBe(USER_EDIT_TEST_DATA.newEmail);
+          expect(apiResponse.id).toBe(testUser.id);
+        });
+
+        await test.step("User can see the new updated user information on the list beside the success toast message", async () => {
+          await usersPage.verifySuccessMessage(SUCCESS_MESSAGES.UPDATE_SUCCESS);
+
+          const userInList = await usersPage.getUserByEmail(
+            USER_EDIT_TEST_DATA.newEmail,
+          );
+          await expect(userInList).toBeVisible();
+          await expect(userInList).toContainText(USER_EDIT_TEST_DATA.newEmail);
+        });
+
+        await test.step("Verify UI result matches API response", async () => {
+          expect(apiResponse.email).toBe(USER_EDIT_TEST_DATA.newEmail);
+          expect(apiResponse.id).toBe(testUser.id);
+
+          const userInList = await usersPage.getUserByEmail(
+            USER_EDIT_TEST_DATA.newEmail,
+          );
+          await expect(userInList).toContainText(apiResponse.email);
+
+          testUser = apiResponse;
+        });
+      },
+    );
+  });
 
   // TC_USERS_005: User cannot submit edit user form with invalid value
   for (const testCase of USER_EDIT_INVALID_TEST_DATA) {
-    test.describe(`Edit Form Validation - ${testCase.caseId}`, () => {
+    test.describe(`TC_USERS_005 - User cannot submit edit user form with invalid value`, () => {
       let testUser: User;
 
       // Setup: Create a user before the test
@@ -175,7 +168,7 @@ test.describe("User Edit Tests", () => {
       });
 
       test(
-        `TC_USERS_005 - User cannot submit edit user form with invalid value - ${testCase.caseId}`,
+        `TC_USERS_005 - User cannot submit edit user form with ${testCase.description}`,
         {
           tag: ["@TC_USERS_005", "@user", "@edit"],
         },
@@ -232,7 +225,7 @@ test.describe("User Edit Tests", () => {
 
   // TC_USERS_006: User cannot submit edit user form with wrong value
   for (const testCase of USER_EDIT_WRONG_VALUE_TEST_DATA) {
-    test.describe(`Edit Wrong Values - ${testCase.caseId}`, () => {
+    test.describe(`TC_USERS_006 - User cannot submit edit user form with wrong value`, () => {
       let testUser: User;
 
       // Setup: Create a user before the test
@@ -266,7 +259,7 @@ test.describe("User Edit Tests", () => {
       });
 
       test(
-        `TC_USERS_006 - User cannot submit edit user form with wrong value - ${testCase.caseId}`,
+        `TC_USERS_006 - User cannot submit edit user form with ${testCase.description}`,
         {
           tag: ["@TC_USERS_006", "@user", "@edit"],
         },

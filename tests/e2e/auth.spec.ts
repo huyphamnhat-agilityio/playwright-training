@@ -8,8 +8,6 @@ import {
   WRONG_CREDENTIALS,
 } from "@tests/constants";
 
-test.describe.configure({ mode: "parallel" });
-
 test.describe("Authentication Tests", () => {
   test.slow();
 
@@ -47,7 +45,7 @@ test.describe("Authentication Tests", () => {
   // Parameterized test for invalid credentials (form validation)
   for (const testCase of INVALID_CREDENTIALS) {
     test(
-      `TC_AUTH_002 - User cannot submit login form with invalid credentials - ${testCase.caseId}`,
+      `TC_AUTH_002 - User cannot submit login form with ${testCase.description}`,
       {
         tag: ["@TC_AUTH_002", "@auth", "@login"],
       },
@@ -77,40 +75,34 @@ test.describe("Authentication Tests", () => {
   }
 
   // Parameterized test for wrong credentials (authentication failure)
-  for (const testCase of WRONG_CREDENTIALS) {
-    test(
-      `TC_AUTH_003 - User cannot login with wrong credentials - ${testCase.caseId}`,
-      {
-        tag: ["@TC_AUTH_003", "@auth", "@login"],
-      },
-      async ({ loginPage }) => {
-        test.slow();
-        test.info().annotations.push({
-          type: "description",
-          description: testCase.description,
-        });
+  test(
+    `TC_AUTH_003 - User cannot login with wrong username and password`,
+    {
+      tag: ["@TC_AUTH_003", "@auth", "@login"],
+    },
+    async ({ loginPage }) => {
+      test.slow();
 
-        await test.step(`User fills the email field with wrong email: "${testCase.email}"`, async () => {
-          await loginPage.emailField.fill(testCase.email);
-        });
+      await test.step(`User fills the email field with wrong email"`, async () => {
+        await loginPage.emailField.fill(WRONG_CREDENTIALS.email);
+      });
 
-        await test.step(`User fills the password field with wrong password: "${testCase.password}"`, async () => {
-          await loginPage.passwordField.fill(testCase.password);
-        });
+      await test.step(`User fills the password field with wrong password: "${WRONG_CREDENTIALS.password}"`, async () => {
+        await loginPage.passwordField.fill(WRONG_CREDENTIALS.password);
+      });
 
-        await test.step("User clicks the login button", async () => {
-          await loginPage.loginButton.click();
-        });
+      await test.step("User clicks the login button", async () => {
+        await loginPage.loginButton.click();
+      });
 
-        await test.step("User stays on login page and sees error message", async () => {
-          await expect(loginPage.page).toHaveURL(URL_PATTERNS.LOGIN);
-          await expect(
-            loginPage.page.getByText(ERROR_MESSAGES.INVALID_CREDENTIALS),
-          ).toBeVisible();
-        });
-      },
-    );
-  }
+      await test.step("User stays on login page and sees the toast error message on the page", async () => {
+        await expect(loginPage.page).toHaveURL(URL_PATTERNS.LOGIN);
+        await expect(
+          loginPage.page.getByText(ERROR_MESSAGES.INVALID_CREDENTIALS),
+        ).toBeVisible();
+      });
+    },
+  );
 
   test(
     "TC_AUTH_004 - User can logout",

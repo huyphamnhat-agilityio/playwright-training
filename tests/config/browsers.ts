@@ -1,22 +1,16 @@
 import { devices } from "@playwright/test";
 
-export const BROWSERS = {
-  CHROMIUM: "chromium",
-  FIREFOX: "firefox",
-  WEBKIT: "webkit",
-} as const;
-
 export const BROWSER_CONFIGS = [
   {
-    name: BROWSERS.CHROMIUM,
+    name: "chromium",
     device: devices["Desktop Chrome"],
   },
   {
-    name: BROWSERS.FIREFOX,
+    name: "firefox",
     device: devices["Desktop Firefox"],
   },
   {
-    name: BROWSERS.WEBKIT,
+    name: "webkit",
     device: devices["Desktop Safari"],
   },
 ] as const;
