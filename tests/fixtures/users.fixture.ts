@@ -1,5 +1,9 @@
 import { test as base } from "@playwright/test";
-import { USER_DELETE_TEST_DATA, USER_SORT_TEST_DATA } from "@tests/constants";
+import {
+  USER_DELETE_TEST_DATA,
+  USER_SEARCH_TEST_DATA,
+  USER_SORT_TEST_DATA,
+} from "@tests/constants";
 import { UsersPage } from "@tests/pages/UsersPage";
 import { createUser, deleteUser } from "@tests/services";
 
@@ -12,6 +16,7 @@ type UsersFixtures = {
     userList: { email: string; id: string }[];
     sortOptions: { field: string; locator: string }[];
   };
+  searchUsersPage: UsersPage;
 };
 
 export const test = base.extend<UsersFixtures>({
@@ -54,7 +59,7 @@ export const test = base.extend<UsersFixtures>({
         passwordConfirm: payload.password,
       });
 
-      if (user) {
+      if (user.id) {
         userList.push({ email: user.email, id: user.id });
       }
     }
@@ -68,6 +73,33 @@ export const test = base.extend<UsersFixtures>({
         sortOptions: USER_SORT_TEST_DATA.sortOptions,
       }),
     );
+
+    // Clear user data after test
+    for (const { id } of userList) {
+      await deleteUser(id);
+    }
+  },
+  searchUsersPage: async ({ page }, use) => {
+    const usersPage = new UsersPage(page);
+
+    const userList: { email: string; id: string }[] = [];
+
+    // Prepare data before search test
+    for (const payload of USER_SEARCH_TEST_DATA) {
+      const user = await createUser({
+        ...payload,
+        passwordConfirm: payload.password,
+      });
+
+      if (user.id) {
+        userList.push(user);
+      }
+    }
+
+    await usersPage.navigateTo();
+
+    // Pass a combined object into the fixture
+    await use(Object.assign(usersPage));
 
     // Clear user data after test
     for (const { id } of userList) {

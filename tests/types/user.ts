@@ -1,3 +1,5 @@
+import { UserFormData } from "./form";
+
 export type User = {
   avatar: string;
   collectionId: string;
@@ -17,4 +19,4 @@ export type UserCreatePayload = {
   email: string;
   password: string;
   passwordConfirm: string;
-};
+} & Omit<Partial<UserFormData>, "id">;

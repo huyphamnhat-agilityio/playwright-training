@@ -15,6 +15,8 @@ export class UsersPage extends BasePage {
   readonly deleteButton: Locator;
   readonly confirmDeleteButton: Locator;
   readonly cancelButton: Locator;
+  readonly searchInput: Locator;
+  readonly searchButton: Locator;
   readonly table: Table;
 
   constructor(page: Page) {
@@ -33,6 +35,10 @@ export class UsersPage extends BasePage {
     this.deleteButton = page.getByRole("button", { name: "Delete selected" });
     this.confirmDeleteButton = page.getByRole("button", { name: "Yes" });
     this.cancelButton = page.getByRole("button", { name: "Cancel" });
+    this.searchInput = page
+      .getByRole("textbox")
+      .filter({ hasText: "Search term or filter like" });
+    this.searchButton = page.getByRole("button", { name: "Search" });
     this.table = new Table(page, "table");
   }
 

@@ -162,35 +162,16 @@ export const USER_SORT_TEST_DATA = {
     { field: " created ", locator: "created" },
   ],
 };
-// export const USER_SORT_TEST_DATA = [
-//   {
-//     caseId: "Case 1",
-//     description: "Sort users by email",
-//     sortField: ,
-//     sortLocator: "",
-//     testUsers: ,
-//   },
-//   {
-//     caseId: "Case 2",
-//     description: "Sort users by username",
-//     sortField: ",
-//     sortLocator: "username",
 
-//     testUsers: [
-//       { email: "usersort3@example.com", password: "testpass123" },
-//       { email: "usersort1@example.com", password: "testpass123" },
-//       { email: "usersort2@example.com", password: "testpass123" },
-//     ],
-//   },
-//   {
-//     caseId: "Case 3",
-//     description: "Sort users by created date",
-//     sortField: "",
-//     sortLocator: "created",
-//     testUsers: [
-//       { email: "newest@example.com", password: "testpass123" },
-//       { email: "oldest@example.com", password: "testpass123" },
-//       { email: "middle@example.com", password: "testpass123" },
-//     ],
-//   },
-// ];
+export const USER_SEARCH_TEST_DATA = [
+  {
+    email: "searchbyemail@example.com",
+    password: "12345678",
+    username: "usersearchbyemail",
+  },
+  {
+    email: "searchbyname@example.com",
+    password: "12345678",
+    username: "usersearchbyname",
+  },
+];

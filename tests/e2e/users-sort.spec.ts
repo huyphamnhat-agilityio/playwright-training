@@ -7,9 +7,9 @@ test.describe("User Sort Tests", () => {
 
   for (const options of USER_SORT_TEST_DATA.sortOptions) {
     test(
-      `TC_USER_008 - Verify sorting users by "${options.field}"`,
+      `TC_USERS_008 - Verify sorting users by "${options.field}"`,
       {
-        tag: ["@TC_USER_008", "@user", "@sort"],
+        tag: ["@TC_USERS_008", "@user", "@sort"],
       },
       async ({ sortUsersPage }) => {
         await sortUsersPage.waitForPageLoad();

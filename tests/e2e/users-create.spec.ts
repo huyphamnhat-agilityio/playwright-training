@@ -16,7 +16,7 @@ import userAuthState from "../../playwright/.auth/user.json";
 test.describe("User Creation Tests", () => {
   test.slow();
 
-  // TC_USER_001: User can create a user with valid value
+  // TC_USERS_001: User can create a user with valid value
   for (const testCase of USER_CREATION_TEST_DATA) {
     test.describe(`${testCase.caseId}`, () => {
       let createdUser: User;
@@ -46,9 +46,9 @@ test.describe("User Creation Tests", () => {
       });
 
       test(
-        `TC_USER_001 - User can create a user with valid value - ${testCase.caseId}`,
+        `TC_USERS_001 - User can create a user with valid value - ${testCase.caseId}`,
         {
-          tag: ["@TC_USER_001", "@user", "@create"],
+          tag: ["@TC_USERS_001", "@user", "@create"],
         },
         async ({ usersPage }) => {
           test.slow();
@@ -123,13 +123,13 @@ test.describe("User Creation Tests", () => {
     });
   }
 
-  // TC_USER_002: User cannot submit create user form with invalid value
+  // TC_USERS_002: User cannot submit create user form with invalid value
   for (const testCase of USER_INVALID_FORM_TEST_DATA) {
     test.describe(`${testCase.caseId}`, () => {
       test(
-        `TC_USER_002 - User cannot submit create user form with invalid value - ${testCase.caseId}`,
+        `TC_USERS_002 - User cannot submit create user form with invalid value - ${testCase.caseId}`,
         {
-          tag: ["@TC_USER_002", "@user", "@create"],
+          tag: ["@TC_USERS_002", "@user", "@create"],
         },
         async ({ usersPage }) => {
           test.info().annotations.push({
@@ -173,13 +173,13 @@ test.describe("User Creation Tests", () => {
     });
   }
 
-  // TC_USER_003: User cannot create user with wrong value
+  // TC_USERS_003: User cannot create user with wrong value
   for (const testCase of USER_WRONG_VALUE_TEST_DATA) {
     test.describe(`${testCase.caseId}`, () => {
       test(
-        `TC_USER_003 - User cannot create user with wrong value - ${testCase.caseId}`,
+        `TC_USERS_003 - User cannot create user with wrong value - ${testCase.caseId}`,
         {
-          tag: ["@TC_USER_003", "@user", "@create"],
+          tag: ["@TC_USERS_003", "@user", "@create"],
         },
         async ({ page, usersPage }) => {
           test.slow();
