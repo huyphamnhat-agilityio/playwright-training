@@ -12,7 +12,7 @@ test.describe("Authentication Tests", () => {
   test.slow();
 
   test(
-    "TC_AUTH_001 - User can login with right username and password",
+    "User can login with right username and password",
     {
       tag: ["@TC_AUTH_001", "@auth", "@login"],
     },
@@ -45,7 +45,7 @@ test.describe("Authentication Tests", () => {
   // Parameterized test for invalid credentials (form validation)
   for (const testCase of INVALID_CREDENTIALS) {
     test(
-      `TC_AUTH_002 - User cannot submit login form with ${testCase.description}`,
+      `User cannot submit login form with ${testCase.description}`,
       {
         tag: ["@TC_AUTH_002", "@auth", "@login"],
       },
@@ -76,7 +76,7 @@ test.describe("Authentication Tests", () => {
 
   // Parameterized test for wrong credentials (authentication failure)
   test(
-    `TC_AUTH_003 - User cannot login with wrong username and password`,
+    `User cannot login with wrong username and password`,
     {
       tag: ["@TC_AUTH_003", "@auth", "@login"],
     },
@@ -105,7 +105,7 @@ test.describe("Authentication Tests", () => {
   );
 
   test(
-    "TC_AUTH_004 - User can logout",
+    "User can logout",
     {
       tag: ["@TC_AUTH_004", "@auth", "@login"],
     },

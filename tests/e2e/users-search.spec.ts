@@ -6,7 +6,7 @@ test.describe("User Search Tests", () => {
   test.slow();
 
   test(
-    `TC_USERS_009 - User can search user by email`,
+    `User can search user by email`,
     {
       tag: ["@TC_USERS_009", "@user", "@search"],
     },
@@ -51,14 +51,14 @@ test.describe("User Search Tests", () => {
   );
 
   test(
-    `TC_USERS_009 - User can search user by username`,
+    `User can search user by username`,
     {
       tag: ["@TC_USERS_009", "@user", "@search"],
     },
     async ({ searchUsersPage, browserName }) => {
       const expectedUser = USER_SEARCH_TEST_DATA[1];
 
-      await searchUsersPage.navigateTo();
+      await searchUsersPage.page.reload();
 
       // User fill the search input with value
       await test.step(`User focus and fill the search input with value`, async () => {

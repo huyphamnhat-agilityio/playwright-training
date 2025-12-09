@@ -12,7 +12,7 @@ test.describe("User Edit Tests", () => {
   test.slow();
 
   // TC_USERS_004: User can edit user
-  test.describe(`TC_USERS_004 - User can edit user`, () => {
+  test.describe(`User can edit user`, () => {
     let testUser: User;
 
     // Setup: Create a user before the test
@@ -134,7 +134,7 @@ test.describe("User Edit Tests", () => {
 
   // TC_USERS_005: User cannot submit edit user form with invalid value
   for (const testCase of USER_EDIT_INVALID_TEST_DATA) {
-    test.describe(`TC_USERS_005 - User cannot submit edit user form with invalid value`, () => {
+    test.describe(`User cannot submit edit user form with invalid value`, () => {
       let testUser: User;
 
       // Setup: Create a user before the test
@@ -225,7 +225,7 @@ test.describe("User Edit Tests", () => {
 
   // TC_USERS_006: User cannot submit edit user form with wrong value
   for (const testCase of USER_EDIT_WRONG_VALUE_TEST_DATA) {
-    test.describe(`TC_USERS_006 - User cannot submit edit user form with wrong value`, () => {
+    test.describe(`User cannot submit edit user form with wrong value`, () => {
       let testUser: User;
 
       // Setup: Create a user before the test

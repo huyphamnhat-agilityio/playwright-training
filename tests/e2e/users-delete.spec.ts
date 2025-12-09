@@ -7,7 +7,7 @@ test.describe("User Delete Tests", () => {
   let testUser: { email: string; id: string };
   // TC_USERS_007_1: User can delete users
   test(
-    `TC_USERS_007_1 - User can delete a single user`,
+    `User can delete a single user`,
     {
       tag: ["@TC_USERS_007_1", "@user", "@delete"],
     },
@@ -50,7 +50,7 @@ test.describe("User Delete Tests", () => {
   );
 
   test(
-    `TC_USERS_007_2 - User can delete multiple users`,
+    `User can delete multiple users`,
     {
       tag: ["@TC_USERS_007_2`", "@user", "@delete"],
     },
@@ -62,8 +62,6 @@ test.describe("User Delete Tests", () => {
           const deleteCheckbox = deleteUsersPage.getUserDeleteCheckbox(
             testUser.id,
           );
-
-          await deleteCheckbox.waitFor({ state: "visible", timeout: 5000 });
 
           await deleteCheckbox.click();
         }

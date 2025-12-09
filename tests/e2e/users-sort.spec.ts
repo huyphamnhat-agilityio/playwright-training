@@ -8,7 +8,7 @@ test.describe("User Sort Tests", () => {
   test.describe.configure({ mode: "serial" });
   for (const options of USER_SORT_TEST_DATA.sortOptions) {
     test(
-      `TC_USERS_008 -User can sort users by "${options.field}"`,
+      `User can sort users by "${options.field}"`,
       {
         tag: ["@TC_USERS_008", "@user", "@sort"],
       },

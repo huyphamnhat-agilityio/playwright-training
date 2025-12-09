@@ -16,7 +16,7 @@ test.describe("User Creation Tests", () => {
   test.slow();
 
   // TC_USERS_001: User can create a user with valid value
-  test.describe("TC_USER_001 - User can create a user", () => {
+  test.describe("User can create a user", () => {
     let createdUser: User;
 
     // Cleanup after the test
@@ -35,7 +35,7 @@ test.describe("User Creation Tests", () => {
     });
 
     test(
-      `TC_USERS_001 - User can create a user with valid value`,
+      `User can create a user with valid value`,
       {
         tag: ["@TC_USERS_001", "@user", "@create"],
       },
@@ -110,9 +110,9 @@ test.describe("User Creation Tests", () => {
 
   // TC_USERS_002: User cannot submit create user form with invalid value
   for (const testCase of USER_INVALID_FORM_TEST_DATA) {
-    test.describe(`TC_USERS_002 - User cannot submit create user form with invalid form value`, () => {
+    test.describe(`User cannot submit create user form with invalid form value`, () => {
       test(
-        `TC_USERS_002 - User cannot submit create user form with ${testCase.description}`,
+        `User cannot submit create user form with ${testCase.description}`,
         {
           tag: ["@TC_USERS_002", "@user", "@create"],
         },
@@ -161,7 +161,7 @@ test.describe("User Creation Tests", () => {
   // TC_USERS_003: User cannot create user with wrong value
   for (const testCase of USER_WRONG_VALUE_TEST_DATA) {
     test(
-      `TC_USERS_003 - User cannot create user with${testCase.description}`,
+      `User cannot create user with${testCase.description}`,
       {
         tag: ["@TC_USERS_003", "@user", "@create"],
       },
